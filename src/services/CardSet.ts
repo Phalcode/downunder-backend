@@ -88,12 +88,14 @@ export class CardSet {
     }
 
     drawMultiple(count: number) {
-        const cards = []
+        const cards: Card[] = []
         if (this.count() < count) {
             this.useOldCards();
         }
         for (let i = count; i > 0; i--) {
-            cards.push(this.cards.pop());
+
+            let c = this.cards.pop()
+            if (c) cards.push();
         }
         return cards;
     }
@@ -105,6 +107,11 @@ export class CardSet {
     useOldCards() {
         this.cards = this.playedCards.concat(this.cards);
         this.playedCards = [];
-        this.shuffle;
+        this.shuffle();
+    }
+
+    returnCards(cards: Card[]) {
+        this.cards = this.playedCards.concat(this.cards);
+        this.shuffle()
     }
 }
