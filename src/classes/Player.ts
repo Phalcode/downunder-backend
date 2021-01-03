@@ -1,9 +1,9 @@
 import { nanoid } from 'nanoid';
 import { Card } from './Card';
 export class Player {
+    id = nanoid(5);
     username: string;
     ip: string;
-    id = nanoid();
     cards: Card[] = [];
     chips: number;
 
