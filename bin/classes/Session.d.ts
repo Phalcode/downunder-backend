@@ -16,7 +16,7 @@ export declare class Session implements ISession {
     reverse: boolean;
     constructor(name: string, chips?: number, maxPlayers?: number, hidden?: boolean);
     reset(): void;
-    join(username: string, ip: string): void;
+    join(username: string, ip: string): Player | undefined;
     leave(playerId: string): void;
     nextTurn(): void;
     changeDirection(): void;

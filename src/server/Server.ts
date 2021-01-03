@@ -2,8 +2,10 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
 import GameRouter from "../routes/GameRouter";
+import * as dotenv from "dotenv";
+dotenv.config();
 
-const port = 7777;
+const port = process.env.PORT || 7777;
 const app: express.Application = express();
 
 app.use(logger("dev"));

@@ -20,16 +20,21 @@ class Session {
         this.hidden = hidden;
     }
     reset() {
-        for (const player of this.players) {
-            player.cards = [];
-            player.chips = this.chips;
-        }
         this.cardset = new CardSet_1.CardSet();
+        for (const player of this.players) {
+            player.chips = this.chips;
+            player.cards = this.cardset.drawMultiple(5);
+        }
+        for (let i = this.players.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [this.players[i], this.players[j]] = [this.players[j], this.players[i]];
+        }
     }
     join(username, ip) {
         if (this.players.length < this.maxPlayers) {
             const newPlayer = new Player_1.Player(username, ip, this.cardset.drawMultiple(5), this.chips);
             this.players.push(newPlayer);
+            return newPlayer;
         }
     }
     leave(playerId) {

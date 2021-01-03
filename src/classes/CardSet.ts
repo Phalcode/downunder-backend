@@ -93,7 +93,6 @@ export class CardSet {
             this.useOldCards();
         }
         for (let i = count; i > 0; i--) {
-
             let c = this.cards.pop()
             if (c) cards.push();
         }
