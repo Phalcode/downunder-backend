@@ -3,59 +3,38 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 const express_1 = __importDefault(require("express"));
-const node_cache_1 = __importDefault(require("node-cache"));
-const cache = new node_cache_1.default({ stdTTL: 1800, checkperiod: 60 });
+const Session_1 = require("../classes/Session");
 const router = express_1.default.Router();
-const cards = [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 22, 33, 44, 55, 66, 76, -10];
-let count = 0;
-let player1cards = [];
-let player2cards = [];
-router.get("/count", (request, response) => {
-    response.status(200).send(`Die Lowbob Zahl ist: ${count}`);
+const sessions = [];
+// Create a new session
+router.post("/session", (request, response) => {
+    const session = request.body;
+    const newSession = new Session_1.Session(session.chips, session.maxPlayers, session.hidden);
+    sessions.push(newSession);
+    response.status(201).send();
 });
-router.get("/cards/:playerid", (request, response) => {
-    if (request.params.playerid === "1") {
-        response.status(200).send(`Deine Karten sind: ${player1cards.toString()}`);
-    }
-    else {
-        response.status(200).send(`Deine Karten sind: ${player2cards.toString()}`);
-    }
+// Delete a session
+router.delete("/session/:sessionid", (request, response) => {
 });
-router.get("/draw/:playerid", (request, response) => {
-    const newCard = cards[Math.floor(Math.random() * cards.length)];
-    if (request.params.playerid === "1") {
-        player1cards.push(newCard);
-    }
-    else {
-        player2cards.push(newCard);
-    }
-    response.status(200).send(`Deine neue Karte ist: ${newCard}`);
+// Get game info
+router.get("/session/:sessionid/", (request, response) => {
 });
-router.post("/play/:playerid", (request, response) => {
-    if (request.params.playerid === "1") {
-        if (player1cards.includes(request.body.card)) {
-            delete player1cards[player1cards.indexOf(request.body.card)];
-        }
-        else {
-            response.status(404).send(`Du hast diese Karte nicht. Deine Karten sind: ${player1cards.toString()}`);
-            return;
-        }
-    }
-    else {
-        if (player2cards.includes(request.body.card)) {
-            delete player2cards[player2cards.indexOf(request.body.card)];
-        }
-        else {
-            response.status(404).send(`Du hast diese Karte nicht. Deine Karten sind: ${player2cards.toString()}`);
-        }
-    }
-    count += request.body.card;
-    response.status(200).send(`Die Lowbob Zahl ist: ${count}`);
+// Get player info
+router.get("/session/:sessionid/player/:playerid", (request, response) => {
 });
-router.get("/reset", (request, response) => {
-    count = 0;
-    player1cards = [cards[Math.floor(Math.random() * cards.length)], cards[Math.floor(Math.random() * cards.length)], cards[Math.floor(Math.random() * cards.length)], cards[Math.floor(Math.random() * cards.length)], cards[Math.floor(Math.random() * cards.length)]];
-    player2cards = [cards[Math.floor(Math.random() * cards.length)], cards[Math.floor(Math.random() * cards.length)], cards[Math.floor(Math.random() * cards.length)], cards[Math.floor(Math.random() * cards.length)], cards[Math.floor(Math.random() * cards.length)]];
-    response.status(200).send(`Das Spiel wurde zurückgesetzt`);
+// Play a card
+router.post("/session/:sessionid/player/:playerid/play/:cardid", (request, response) => {
+});
+// Draw a card
+router.get("/session/:sessionid/player/:playerid/draw", (request, response) => {
+});
+// End Turn
+router.post("/session/:sessionid/player/:playerid/turn", (request, response) => {
+});
+// Remove player from session
+router.delete("/session/:sessionid/player/:playerid", (request, response) => {
+});
+// Reset a session
+router.delete("/session/:sessionid/reset", (request, response) => {
 });
 module.exports = router;

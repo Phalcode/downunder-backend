@@ -2,9 +2,11 @@ import { Player } from "./Player";
 import { nanoid } from 'nanoid';
 import { CardSet } from "./CardSet";
 import { ISession } from "../models/ISession";
+import { textChangeRangeIsUnchanged } from "typescript";
 
 export class Session implements ISession {
     id = nanoid(5);
+    name: string;
     cardset: CardSet = new CardSet();
     count: number = 0;
     chips: number;
@@ -12,7 +14,8 @@ export class Session implements ISession {
     maxPlayers: number;
     hidden: boolean;
 
-    constructor(chips = 3, maxPlayers = 8, hidden = false) {
+    constructor(name: string, chips = 3, maxPlayers = 8, hidden = false) {
+        this.name = name;
         this.chips = chips;
         this.maxPlayers = maxPlayers;
         this.hidden = hidden;

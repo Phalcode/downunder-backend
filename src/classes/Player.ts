@@ -1,6 +1,7 @@
 import { nanoid } from 'nanoid';
+import { IPlayer } from '../models/IPlayer';
 import { Card } from './Card';
-export class Player {
+export class Player implements IPlayer {
     id = nanoid(5);
     username: string;
     ip: string;

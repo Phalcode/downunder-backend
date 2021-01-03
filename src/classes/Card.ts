@@ -1,6 +1,7 @@
 import { CardType } from '../models/CardTypes';
+import { ICard } from '../models/ICard';
 import { nanoid } from 'nanoid';
-export class Card {
+export class Card implements ICard {
     id = nanoid(5);
     type: CardType;
     description: string;
