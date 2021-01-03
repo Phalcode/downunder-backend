@@ -1,9 +1,10 @@
 import { IPlayer } from "./IPlayer";
 export interface ISession {
-    id: string;
-    count: number;
-    chips: number;
-    players: IPlayer[];
-    maxPlayers: number;
-    hidden: boolean;
+    readonly id?: string;
+    readonly name: string;
+    readonly chips: number;
+    readonly maxPlayers: number;
+    readonly hidden: boolean;
+    count?: number;
+    players?: IPlayer[];
 }

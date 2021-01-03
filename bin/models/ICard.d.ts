@@ -1,7 +1,7 @@
 import { CardType } from "./CardTypes";
 export interface ICard {
-    id: string;
-    type: CardType;
-    description: string;
-    value?: number;
+    readonly id: string;
+    readonly type: CardType;
+    readonly description: string;
+    readonly value?: number;
 }
