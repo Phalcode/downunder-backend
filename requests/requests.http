@@ -1,0 +1,19 @@
+### Reset the Game
+GET http://localhost:7777/reset
+### Lowbob Count
+GET http://localhost:7777/count
+
+
+
+
+### Karten von Spieler 1
+GET http://localhost:7777/cards/1
+### Karte spielen
+POST http://localhost:7777/play/1
+Content-Type: application/json
+
+{
+    "card": 3
+}
+### Karte ziehen mit Spieler 1
+GET http://localhost:7777/draw/1
