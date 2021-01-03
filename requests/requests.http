@@ -3,7 +3,7 @@ POST    http://localhost:7777/session
 ### Reset a session
 GET     http://localhost:7777/session/:sessionid/reset
 ### Delete a session
-DELETE  http://localhost:7777/session/:sessionid/
+DELETE  http://localhost:7777/session/:sessionid
 ### Get game info
 GET     http://localhost:7777/session/:sessionid
 ### Create new Player
