@@ -10,8 +10,7 @@
     "serve": "node ./bin/server/Server.js"
   },
   "authors": [
-    "Alfagun74",
-    "Yelo"
+    "Alfagun74"
   ],
   "license": "ISC",
   "dependencies": {
