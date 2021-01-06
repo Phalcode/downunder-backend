@@ -74,17 +74,17 @@ export class Session implements ISession {
         switch (card.type) {
             case CardType.Normal: {
                 session.count += card?.value || 0;
-                player.cards.splice(player.cards.indexOf(card), 1);
-                session.cardset.playCard(card);
-                break
+                break;
             }
             case CardType.Double: {
-                break
+                break;
             }
             case CardType.ChangeDirection: {
                 this.changeDirection();
-                break
+                break;
             }
         }
+        player.cards.splice(player.cards.indexOf(card), 1);
+        session.cardset.playCard(card);
     }
 }
