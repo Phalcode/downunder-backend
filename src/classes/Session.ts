@@ -9,7 +9,6 @@ export class Session implements ISession {
     readonly name: string;
     readonly chips: number;
     readonly maxPlayers: number;
-    readonly hidden: boolean;
     readonly id = nanoid(5);
     cardset: CardSet = new CardSet();
     players: Player[] = [];

@@ -5,7 +5,6 @@ export interface ISession {
     readonly name: string;
     readonly chips: number;
     readonly maxPlayers: number;
-    readonly hidden: boolean;
     count?: number;
     players?: IPlayer[];
 }
