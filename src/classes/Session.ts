@@ -21,7 +21,6 @@ export class Session implements ISession {
         this.name = name;
         this.chips = chips;
         this.maxPlayers = maxPlayers;
-        this.hidden = hidden;
     }
 
     reset() {
