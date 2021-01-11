@@ -47,7 +47,7 @@ router.post("/session/:sessionid/player", (request, response) => {
         response.status(201).json(player);
     }
     catch (error) {
-        switch (error) {
+        switch (error.message) {
             case Errors_1.Errors.ERR_MAX_PLAYERS:
                 // TODO: HTTP ERROR IN YAML
                 response.status(401).send(Errors_1.Errors.ERR_MAX_PLAYERS);
@@ -57,6 +57,7 @@ router.post("/session/:sessionid/player", (request, response) => {
                 response.status(401).send(Errors_1.Errors.ERR_SAME_USERNAME);
                 break;
             default:
+                console.log(error);
                 response.status(500).send();
                 break;
         }
