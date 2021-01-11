@@ -5,6 +5,7 @@ const Player_1 = require("./Player");
 const nanoid_1 = require("nanoid");
 const CardSet_1 = require("./CardSet");
 const CardTypes_1 = require("../models/CardTypes");
+const Errors_1 = require("../models/Errors");
 class Session {
     constructor(name, chips = 3, maxPlayers = 8) {
         this.id = nanoid_1.nanoid(5);
@@ -30,14 +31,18 @@ class Session {
         }
     }
     join(username, ip) {
-        if (this.players.length < this.maxPlayers) {
-            const newPlayer = new Player_1.Player(username, ip, this.cardset.drawMultiple(5), this.chips);
-            this.players.push(newPlayer);
-            return newPlayer;
+        if (this.players.length >= this.maxPlayers) {
+            throw new Error(Errors_1.Errors.ERR_MAX_PLAYERS);
         }
+        if (this.players.find((player) => player.username == username)) {
+            throw new Error(Errors_1.Errors.ERR_SAME_USERNAME);
+        }
+        const newPlayer = new Player_1.Player(username, ip, this.cardset.drawMultiple(5), this.chips);
+        this.players.push(newPlayer);
+        return newPlayer;
     }
     leave(playerId) {
-        const leavingPlayer = this.players.find(player => player.id = playerId);
+        const leavingPlayer = this.players.find((player) => (player.id = playerId));
         if (leavingPlayer) {
             this.cardset.returnCards(leavingPlayer.cards);
             this.players.splice(this.players.indexOf(leavingPlayer), 1);
@@ -49,10 +54,10 @@ class Session {
             return;
         }
         if (!this.reverse) {
-            this.turn < this.players.length ? this.turn++ : this.turn = 0;
+            this.turn < this.players.length ? this.turn++ : (this.turn = 0);
         }
         else {
-            this.turn >= 0 ? this.turn-- : this.turn = this.players.length;
+            this.turn >= 0 ? this.turn-- : (this.turn = this.players.length);
         }
     }
     changeDirection() {
