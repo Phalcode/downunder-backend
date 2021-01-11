@@ -42,7 +42,11 @@ export class Session implements ISession {
       throw new Error(Errors.ERR_MAX_PLAYERS);
     }
 
-    if (this.players.find((player) => player.username == username)) {
+    if (
+      this.players.find(
+        (player) => player.username.toLowerCase() == username.toLowerCase()
+      )
+    ) {
       throw new Error(Errors.ERR_SAME_USERNAME);
     }
 
