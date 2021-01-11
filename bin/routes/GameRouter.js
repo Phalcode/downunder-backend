@@ -49,13 +49,15 @@ router.post("/session/:sessionid/player", (request, response) => {
     catch (error) {
         switch (error) {
             case Errors_1.Errors.ERR_MAX_PLAYERS:
-                // TODO: HTTP ERROR
+                // TODO: HTTP ERROR IN YAML
+                response.status(401).send(Errors_1.Errors.ERR_MAX_PLAYERS);
                 break;
             case Errors_1.Errors.ERR_SAME_USERNAME:
                 // TODO: HTTP ERROR
+                response.status(401).send(Errors_1.Errors.ERR_SAME_USERNAME);
                 break;
             default:
-                // TODO: HTTP ERROR 500
+                response.status(500).send();
                 break;
         }
     }

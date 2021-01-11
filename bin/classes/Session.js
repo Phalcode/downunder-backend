@@ -34,7 +34,7 @@ class Session {
         if (this.players.length >= this.maxPlayers) {
             throw new Error(Errors_1.Errors.ERR_MAX_PLAYERS);
         }
-        if (this.players.find((player) => player.username == username)) {
+        if (this.players.find((player) => player.username.toLowerCase() == username.toLowerCase())) {
             throw new Error(Errors_1.Errors.ERR_SAME_USERNAME);
         }
         const newPlayer = new Player_1.Player(username, ip, this.cardset.drawMultiple(5), this.chips);

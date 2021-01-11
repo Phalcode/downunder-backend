@@ -65,7 +65,7 @@ router.post(
       const player = session?.join(playerRequest.username, request.ip);
       response.status(201).json(player);
     } catch (error) {
-      switch (error) {
+      switch (error as Errors) {
         case Errors.ERR_MAX_PLAYERS:
           // TODO: HTTP ERROR IN YAML
           response.status(401).send(Errors.ERR_MAX_PLAYERS);
