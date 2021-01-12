@@ -38,6 +38,10 @@ export class Session implements ISession {
   }
 
   join(username: string, ip: string) {
+    if (username.length < 3) {
+      throw new Error(Errors.ERR_USERNAME_TOO_SHORT);
+    }
+
     if (this.players.length >= this.maxPlayers) {
       throw new Error(Errors.ERR_MAX_PLAYERS);
     }

@@ -31,6 +31,9 @@ class Session {
         }
     }
     join(username, ip) {
+        if (username.length < 3) {
+            throw new Error(Errors_1.Errors.ERR_USERNAME_TOO_SHORT);
+        }
         if (this.players.length >= this.maxPlayers) {
             throw new Error(Errors_1.Errors.ERR_MAX_PLAYERS);
         }

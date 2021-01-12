@@ -5,4 +5,5 @@ var Errors;
 (function (Errors) {
     Errors["ERR_MAX_PLAYERS"] = "The maximum amount of players has been reached.";
     Errors["ERR_SAME_USERNAME"] = "Somebody in this session is already using this username.";
+    Errors["ERR_USERNAME_TOO_SHORT"] = "The username needs to be at least 3 characters long.";
 })(Errors = exports.Errors || (exports.Errors = {}));

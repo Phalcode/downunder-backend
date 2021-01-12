@@ -71,8 +71,12 @@ router.post(
           response.status(401).send(Errors.ERR_MAX_PLAYERS);
           break;
         case Errors.ERR_SAME_USERNAME:
-          // TODO: HTTP ERROR
+          // TODO: HTTP ERROR IN YAML
           response.status(401).send(Errors.ERR_SAME_USERNAME);
+          break;
+        case Errors.ERR_USERNAME_TOO_SHORT:
+          // TODO: HTTP ERROR IN YAML
+          response.status(400).send(Errors.ERR_USERNAME_TOO_SHORT);
           break;
         default:
           console.log(error);
