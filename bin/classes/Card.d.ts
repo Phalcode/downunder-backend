@@ -5,5 +5,6 @@ export declare class Card implements ICard {
     readonly type: CardType;
     readonly description: string;
     readonly value?: number;
-    constructor(type: CardType, description: string, value?: number);
+    readonly source?: string;
+    constructor(type: CardType, description: string, value?: number, source?: string);
 }

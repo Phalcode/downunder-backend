@@ -5,4 +5,5 @@ export interface ICard {
     readonly type: CardType;
     readonly description: string;
     readonly value?: number;
+    readonly source?: string;
 }
