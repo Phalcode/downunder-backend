@@ -22,11 +22,12 @@ router.get("/session/:sessionid/player/:playerid", (request: Request, response: 
     response.status(404).send(`Session with the id ${request.params.sessionid} could not be found`);
     return;
   }
+  console.log(session.players);
   const player = session?.players.find((player) => player.id === request.params.playerid);
   if (!player) {
     response.status(404).send(`Player with the id ${request.params.playerid} could not be found`);
     return;
-  }  
+  }
   response.status(200).json(session.getStrippedSession(player.id));
 });
 
