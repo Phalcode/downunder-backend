@@ -6,6 +6,7 @@ class Player {
     constructor(username, ip, cards, chips = 3) {
         this.id = nanoid_1.nanoid(5);
         this.cards = [];
+        this.turn = false;
         this.username = username;
         this.ip = ip;
         this.cards = cards;

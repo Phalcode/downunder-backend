@@ -1,6 +1,9 @@
+import { Card } from "../classes/Card";
 
 export interface IPlayer {
-    id: string;
-    username: string;
-    chips?: number;
+  username: string;
+  cards?: Card[];
+  id?: string;
+  chips?: number;
+  turn?: boolean;
 }

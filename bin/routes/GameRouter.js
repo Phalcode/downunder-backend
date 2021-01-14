@@ -12,27 +12,27 @@ router.post("/session", (request, response) => {
     const session = request.body;
     const newSession = new Session_1.Session(session.name, session.chips, session.maxPlayers);
     sessions.push(newSession);
-    console.log(newSession);
     response.status(201).json(newSession);
 });
 // Get game info
-router.get("/session/:sessionid/", (request, response) => {
-    const session = sessions.find((session) => session.id === request.params.sessionid);
+router.get("/session/:sessionid/player/:playerid", (request, response) => {
+    let session = sessions.find((session) => session.id === request.params.sessionid);
     if (!session) {
-        response
-            .status(404)
-            .send(`Session with the id ${request.params.sessionid} could not be found`);
+        response.status(404).send(`Session with the id ${request.params.sessionid} could not be found`);
         return;
     }
-    response.status(200).json(session);
+    const player = session?.players.find((player) => player.id === request.params.playerid);
+    if (!player) {
+        response.status(404).send(`Player with the id ${request.params.playerid} could not be found`);
+        return;
+    }
+    response.status(200).json(session.getStrippedSession(player.id));
 });
 // Delete a session
 router.delete("/session/:sessionid", (request, response) => {
     const session = sessions.find((session) => session.id === request.params.sessionid);
     if (!session) {
-        response
-            .status(404)
-            .send(`Session with the id ${request.params.sessionid} could not be found`);
+        response.status(404).send(`Session with the id ${request.params.sessionid} could not be found`);
         return;
     }
     sessions.splice(sessions.indexOf(session), 1);
@@ -67,86 +67,62 @@ router.post("/session/:sessionid/player", (request, response) => {
         }
     }
 });
-// Get player info
-router.get("/session/:sessionid/player/:playerid", (request, response) => {
-    const session = sessions.find((session) => session.id === request.params.sessionid);
-    if (!session) {
-        response
-            .status(404)
-            .send(`Session with the id ${request.params.sessionid} could not be found`);
-        return;
-    }
-    const player = session?.players.find((player) => player.id === request.params.playerid);
-    if (!player) {
-        response
-            .status(404)
-            .send(`Player with the id ${request.params.playerid} could not be found`);
-        return;
-    }
-    response.status(200).json(player);
-});
 // Remove player from session
 router.delete("/session/:sessionid/player/:playerid", (request, response) => {
     const session = sessions.find((session) => session.id === request.params.sessionid);
     if (!session) {
-        response
-            .status(404)
-            .send(`Session with the id ${request.params.sessionid} could not be found`);
+        response.status(404).send(`Session with the id ${request.params.sessionid} could not be found`);
         return;
     }
     const player = session?.players.find((player) => player.id === request.params.playerid);
     if (!player) {
-        response
-            .status(404)
-            .send(`Player with the id ${request.params.playerid} could not be found`);
+        response.status(404).send(`Player with the id ${request.params.playerid} could not be found`);
         return;
     }
     session.players.splice(session.players.indexOf(player), 1);
-    response.status(200).send("The player was removed from the game.");
+    response.status(200).json(session.getStrippedSession(player.id));
 });
 // Draw a card
 router.get("/session/:sessionid/player/:playerid/draw", (request, response) => {
     const session = sessions.find((session) => session.id === request.params.sessionid);
     if (!session) {
-        response
-            .status(404)
-            .send(`Session with the id ${request.params.sessionid} could not be found`);
+        response.status(404).send(`Session with the id ${request.params.sessionid} could not be found`);
         return;
     }
     const player = session?.players.find((player) => player.id === request.params.playerid);
     if (!player) {
-        response
-            .status(404)
-            .send(`Player with the id ${request.params.playerid} could not be found`);
+        response.status(404).send(`Player with the id ${request.params.playerid} could not be found`);
+        return;
+    }
+    if (!player.turn) {
+        response.status(403).send(new Error(Errors_1.Errors.ERR_NOT_YOUR_TURN));
         return;
     }
     const drawedcard = session.cardset.draw();
     if (drawedcard) {
         player.cards.push(drawedcard);
     }
-    response.status(200).json(player);
+    response.status(200).json(session.getStrippedSession(player.id));
 });
 // Play a card
 router.post("/session/:sessionid/player/:playerid/play/:cardid", (request, response) => {
     const session = sessions.find((session) => session.id === request.params.sessionid);
     if (!session) {
-        response
-            .status(404)
-            .send(`Session with the id ${request.params.sessionid} could not be found`);
+        response.status(404).send(`Session with the id ${request.params.sessionid} could not be found`);
         return;
     }
     const player = session?.players.find((player) => player.id === request.params.playerid);
     if (!player) {
-        response
-            .status(404)
-            .send(`Player with the id ${request.params.playerid} could not be found`);
+        response.status(404).send(`Player with the id ${request.params.playerid} could not be found`);
+        return;
+    }
+    if (!player.turn) {
+        response.status(403).send(new Error(Errors_1.Errors.ERR_NOT_YOUR_TURN));
         return;
     }
     const card = player?.cards.find((card) => card.id === request.params.cardid);
     if (!card) {
-        response
-            .status(404)
-            .send(`Card with the id ${request.params.cardid} could not be found`);
+        response.status(404).send(`Card with the id ${request.params.cardid} could not be found`);
         return;
     }
     if (session.turn !== session.players.indexOf(player)) {
@@ -154,31 +130,31 @@ router.post("/session/:sessionid/player/:playerid/play/:cardid", (request, respo
         return;
     }
     session.playCard(session, player, card);
-    response.status(200).json(session);
+    response.status(200).json(session.getStrippedSession(player.id));
 });
 // End Turn
 router.post("/session/:sessionid/player/:playerid/turn", (request, response) => {
     const session = sessions.find((session) => session.id === request.params.sessionid);
     if (!session) {
-        response
-            .status(404)
-            .send(`Session with the id ${request.params.sessionid} could not be found`);
+        response.status(404).send(`Session with the id ${request.params.sessionid} could not be found`);
         return;
     }
     const player = session?.players.find((player) => player.id === request.params.playerid);
     if (!player) {
-        response
-            .status(404)
-            .send(`Player with the id ${request.params.playerid} could not be found`);
+        response.status(404).send(`Player with the id ${request.params.playerid} could not be found`);
+        return;
+    }
+    if (!player.turn) {
+        response.status(403).send(Errors_1.Errors.ERR_NOT_YOUR_TURN);
         return;
     }
     session.nextTurn();
-    response.status(200).send("Your turn is now over.");
+    response.status(200).json(session.getStrippedSession(player.id));
 });
 // Reset a session
 router.delete("/session/:sessionid/reset", (request, response) => {
     const session = sessions.find((session) => session.id === request.params.sessionid);
     session?.reset();
-    response.status(200).json(session);
+    response.status(200);
 });
 module.exports = router;

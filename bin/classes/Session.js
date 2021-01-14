@@ -29,6 +29,7 @@ class Session {
             const j = Math.floor(Math.random() * (i + 1));
             [this.players[i], this.players[j]] = [this.players[j], this.players[i]];
         }
+        this.players[0].turn = true;
     }
     join(username, ip) {
         if (username.length < 3) {
@@ -41,6 +42,9 @@ class Session {
             throw new Error(Errors_1.Errors.ERR_SAME_USERNAME);
         }
         const newPlayer = new Player_1.Player(username, ip, this.cardset.drawMultiple(5), this.chips);
+        if (this.players.length === 0) {
+            newPlayer.turn = true;
+        }
         this.players.push(newPlayer);
         return newPlayer;
     }
@@ -62,6 +66,8 @@ class Session {
         else {
             this.turn >= 0 ? this.turn-- : (this.turn = this.players.length);
         }
+        this.players.map((player) => (player.turn = false));
+        this.players[this.turn].turn = true;
     }
     changeDirection() {
         this.reverse = !this.reverse;
@@ -73,6 +79,7 @@ class Session {
                 break;
             }
             case CardTypes_1.CardType.Double: {
+                // TODO Double Turn
                 break;
             }
             case CardTypes_1.CardType.ChangeDirection: {
@@ -82,6 +89,20 @@ class Session {
         }
         player.cards.splice(player.cards.indexOf(card), 1);
         session.cardset.playCard(card);
+    }
+    removePlayer(player) {
+        this.cardset.returnCards(player.cards);
+        this.players.splice(this.players.indexOf(player), 1);
+    }
+    getStrippedSession(playerId) {
+        const session = { ...this };
+        session.players?.map((p) => {
+            if (p.id !== playerId) {
+                delete p.cards;
+                delete p.id;
+            }
+        });
+        return session;
     }
 }
 exports.Session = Session;

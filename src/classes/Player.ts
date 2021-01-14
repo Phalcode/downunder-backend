@@ -7,6 +7,7 @@ export class Player implements IPlayer {
     ip: string;
     cards: Card[] = [];
     chips: number;
+    turn: boolean = false;
 
     constructor(username: string, ip: string, cards: Card[], chips: number = 3) {
         this.username = username;

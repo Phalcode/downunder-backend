@@ -20,4 +20,6 @@ export declare class Session implements ISession {
     nextTurn(): void;
     changeDirection(): void;
     playCard(session: Session, player: Player, card: Card): void;
+    removePlayer(player: Player): void;
+    getStrippedSession(playerId: string): ISession;
 }
