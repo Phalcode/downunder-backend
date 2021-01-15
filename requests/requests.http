@@ -1,18 +1,18 @@
 ### Create a new Session
 POST    http://localhost:7777/session
 ### Create new Player
-POST    http://localhost:7777/session/:sessionid/player
+POST    http://localhost:7777/session/:sessionId/player
 ### Get game info
-GET     http://localhost:7777/session/:sessionid/player/:playerid
+GET     http://localhost:7777/session/:sessionId/player/:playerId
 ### Delete a session
-DELETE  http://localhost:7777/session/:sessionid
+DELETE  http://localhost:7777/session/:sessionId
 ### Remove player from session
-DELETE  http://localhost:7777/session/:sessionid/player/:playerid
+DELETE  http://localhost:7777/session/:sessionId/player/:playerId
 ### Draw a card
-GET     http://localhost:7777/session/:sessionid/player/:playerid/draw
+GET     http://localhost:7777/session/:sessionId/player/:playerId/draw
 ### Play a card
-POST    http://localhost:7777/session/:sessionid/player/:playerid/play/:cardid
+POST    http://localhost:7777/session/:sessionId/player/:playerId/play/:cardid
 ### End Turn
-POST    http://localhost:7777/session/:sessionid/player/:playerid/turn
+POST    http://localhost:7777/session/:sessionId/player/:playerId/turn
 ### Reset a session
-GET     http://localhost:7777/session/:sessionid/reset
+GET     http://localhost:7777/session/:sessionId/reset
