@@ -1,13 +1,11 @@
 ### Create a new Session
 POST    http://localhost:7777/session
-### Get game info
-GET     http://localhost:7777/session/:sessionid
-### Delete a session
-DELETE  http://localhost:7777/session/:sessionid
 ### Create new Player
 POST    http://localhost:7777/session/:sessionid/player
-### Get player info
+### Get game info
 GET     http://localhost:7777/session/:sessionid/player/:playerid
+### Delete a session
+DELETE  http://localhost:7777/session/:sessionid
 ### Remove player from session
 DELETE  http://localhost:7777/session/:sessionid/player/:playerid
 ### Draw a card
