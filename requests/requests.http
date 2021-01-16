@@ -2,6 +2,11 @@
 POST    http://localhost:7777/session
 ### Create new Player
 POST    http://localhost:7777/session/:sessionId/player
+Content-Type: application/json
+
+{
+    "username":""
+}
 ### Get game info
 GET     http://localhost:7777/session/:sessionId/player/:playerId
 ### Delete a session

@@ -95,7 +95,7 @@ class Session {
         this.players.splice(this.players.indexOf(player), 1);
     }
     getStrippedSession(playerId) {
-        const session = { ...this };
+        const session = JSON.parse(JSON.stringify(this));
         session.players?.map((player) => {
             if (player.id !== playerId) {
                 delete player.cards;
