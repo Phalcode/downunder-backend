@@ -16,7 +16,7 @@ router.post("/session", (request, response) => {
 });
 // Get game info
 router.get("/session/:sessionId/player/:playerId", (request, response) => {
-    let session = sessions.find((session) => session.id === request.params.sessionId);
+    const session = sessions.find((session) => session.id === request.params.sessionId);
     if (!session) {
         response.status(404).send(`Session with the id ${request.params.sessionId} could not be found`);
         return;
@@ -42,6 +42,10 @@ router.delete("/session/:sessionId", (request, response) => {
 // Create a new player
 router.post("/session/:sessionId/player", (request, response) => {
     const session = sessions.find((session) => session.id === request.params.sessionId);
+    if (!session) {
+        response.status(404).send(`Session with the id ${request.params.sessionId} could not be found`);
+        return;
+    }
     try {
         const playerRequest = request.body;
         const player = session?.join(playerRequest.username, request.ip);

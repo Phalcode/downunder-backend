@@ -96,10 +96,10 @@ class Session {
     }
     getStrippedSession(playerId) {
         const session = { ...this };
-        session.players?.map((p) => {
-            if (p.id !== playerId) {
-                delete p.cards;
-                delete p.id;
+        session.players?.map((player) => {
+            if (player.id !== playerId) {
+                delete player.cards;
+                delete player.id;
             }
         });
         return session;
