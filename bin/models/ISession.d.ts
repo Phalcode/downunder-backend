@@ -1,3 +1,4 @@
+import { CardSet } from "../classes/CardSet";
 import { IPlayer } from "./IPlayer";
 export interface ISession {
     readonly id?: string;
@@ -6,4 +7,5 @@ export interface ISession {
     readonly maxPlayers: number;
     count?: number;
     players?: IPlayer[];
+    cardset?: CardSet;
 }

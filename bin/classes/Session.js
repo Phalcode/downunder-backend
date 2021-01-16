@@ -97,6 +97,7 @@ class Session {
     getStrippedSession(playerId) {
         const session = JSON.parse(JSON.stringify(this));
         session.players?.map((player) => {
+            delete session?.cardset;
             if (player.id !== playerId) {
                 delete player.cards;
                 delete player.id;
