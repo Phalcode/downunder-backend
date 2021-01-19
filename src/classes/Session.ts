@@ -39,7 +39,7 @@ export class Session implements ISession {
     this.players[0].turn = true;
   }
 
-  join(username: string, ip: string) {
+  async join(username: string, ip: string) {
     if (username.length < 3) {
       throw new Error(Errors.ERR_USERNAME_TOO_SHORT);
     }
@@ -48,11 +48,21 @@ export class Session implements ISession {
       throw new Error(Errors.ERR_MAX_PLAYERS);
     }
 
-    if (this.players.find((player) => player.username.toLowerCase() == username.toLowerCase())) {
+    if (
+      this.players.find(
+        (player) => player.username.toLowerCase() == username.toLowerCase()
+      )
+    ) {
       throw new Error(Errors.ERR_SAME_USERNAME);
     }
 
-    const newPlayer = new Player(username, ip, this.cardset.drawMultiple(5), this.chips);
+    const newPlayer = new Player(
+      username,
+      ip,
+      this.cardset.drawMultiple(5),
+      this.chips
+    );
+    await newPlayer.getImageUrl();
     if (this.players.length === 0) {
       newPlayer.turn = true;
     }
@@ -122,5 +132,14 @@ export class Session implements ISession {
       }
     });
     return session;
+  }
+
+  refillDeck(player: Player) {
+    for (let i = player.cards.length; i < 5; i++) {
+      const drawedcard = this.cardset.draw();
+      if (drawedcard) {
+        player.cards.push(drawedcard);
+      }
+    }
   }
 }

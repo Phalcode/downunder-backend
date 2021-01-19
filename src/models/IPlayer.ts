@@ -6,4 +6,5 @@ export interface IPlayer {
   id?: string;
   chips?: number;
   turn?: boolean;
+  imageUrl?: string;
 }

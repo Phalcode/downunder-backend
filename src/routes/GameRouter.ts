@@ -42,7 +42,7 @@ router.delete("/session/:sessionId", (request: Request, response: Response) => {
 });
 
 // Create a new player
-router.post("/session/:sessionId/player", (request: Request, response: Response) => {
+router.post("/session/:sessionId/player", async (request: Request, response: Response) => {
   const session = sessions.find((session) => session.id === request.params.sessionId);
   if (!session) {
     response.status(404).send(`Session with the id ${request.params.sessionId} could not be found`);
@@ -50,7 +50,7 @@ router.post("/session/:sessionId/player", (request: Request, response: Response)
   }
   try {
     const playerRequest = request.body as IPlayer;
-    const player = session?.join(playerRequest.username, request.ip);
+    const player = await session?.join(playerRequest.username, request.ip);
     response.status(201).json(player);
   } catch (error) {
     switch (error.message as Errors) {
@@ -67,7 +67,6 @@ router.post("/session/:sessionId/player", (request: Request, response: Response)
         response.status(400).send(Errors.ERR_USERNAME_TOO_SHORT);
         break;
       default:
-        console.log(error);
         response.status(500).send();
         break;
     }
@@ -87,29 +86,6 @@ router.delete("/session/:sessionId/player/:playerId", (request: Request, respons
     return;
   }
   session.players.splice(session.players.indexOf(player), 1);
-  response.status(200).json(session.getStrippedSession(player.id));
-});
-
-// Draw a card
-router.get("/session/:sessionId/player/:playerId/draw", (request: Request, response: Response) => {
-  const session = sessions.find((session) => session.id === request.params.sessionId);
-  if (!session) {
-    response.status(404).send(`Session with the id ${request.params.sessionId} could not be found`);
-    return;
-  }
-  const player = session?.players.find((player) => player.id === request.params.playerId);
-  if (!player) {
-    response.status(404).send(`Player with the id ${request.params.playerId} could not be found`);
-    return;
-  }
-  if (!player.turn) {
-    response.status(403).send(new Error(Errors.ERR_NOT_YOUR_TURN));
-    return;
-  }
-  const drawedcard = session.cardset.draw();
-  if (drawedcard) {
-    player.cards.push(drawedcard);
-  }
   response.status(200).json(session.getStrippedSession(player.id));
 });
 
@@ -158,6 +134,8 @@ router.post("/session/:sessionId/player/:playerId/turn", (request: Request, resp
     response.status(403).send(Errors.ERR_NOT_YOUR_TURN);
     return;
   }
+  
+  session.refillDeck(player);
   session.nextTurn();
   response.status(200).json(session.getStrippedSession(player.id));
 });
