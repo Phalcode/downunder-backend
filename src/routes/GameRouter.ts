@@ -22,7 +22,6 @@ router.get("/session/:sessionId/player/:playerId", (request: Request, response: 
     response.status(404).send(`Session with the id ${request.params.sessionId} could not be found`);
     return;
   }
-  console.log(session.players);
   const player = session?.players.find((player) => player.id === request.params.playerId);
   if (!player) {
     response.status(404).send(`Player with the id ${request.params.playerId} could not be found`);
