@@ -3,33 +3,46 @@ import { nanoid } from "nanoid";
 import { CardSet } from "./CardSet";
 import { ISession } from "../models/ISession";
 import { Card } from "./Card";
-import { CardType } from "../models/CardTypes";
+import { CardTypeEnum } from "../models/CardTypeEnum";
 import { Errors } from "../models/Errors";
-import { use } from "../routes/GameRouter";
 import { IPlayer } from "../models/IPlayer";
+import { PlayerStateEnum } from "../models/PlayerStateEnum";
+import { SessionStateEnum } from "../models/SessionStateEnum";
 
 export class Session implements ISession {
-  readonly name: string;
-  readonly chips: number;
-  readonly maxPlayers: number;
   readonly id = nanoid(5);
+  readonly SETTING_NAME: string;
+  readonly SETTING_CHIPS: number;
+  readonly SETTING_MAX_PLAYERS: number;
+  readonly SETTING_MAX_COUNT: number;
+  state: SessionStateEnum = SessionStateEnum.Running;
   cardset: CardSet = new CardSet();
   players: Player[] = [];
   count: number = 0;
   turn: number = 0;
   doubleTurn: boolean = false;
   reverse: boolean = false;
+  private doubleTurnActivator: number = -1;
 
-  constructor(name: string, chips = 3, maxPlayers = 8) {
-    this.name = name;
-    this.chips = chips;
-    this.maxPlayers = maxPlayers;
+  constructor(
+    SETTING_NAME: string,
+    SETTING_CHIPS = 3,
+    SETTING_MAX_PLAYERS = 8,
+    SETTING_MAX_COUNT = 77
+  ) {
+    this.SETTING_NAME = SETTING_NAME;
+    this.SETTING_CHIPS = SETTING_CHIPS;
+    this.SETTING_MAX_PLAYERS = SETTING_MAX_PLAYERS;
+    this.SETTING_MAX_COUNT = SETTING_MAX_COUNT;
   }
 
-  reset() {
+  async reset() {
     this.cardset = new CardSet();
+    this.state = SessionStateEnum.Running;
     for (const player of this.players) {
-      player.chips = this.chips;
+      await player.getImageUrl();
+      player.state = PlayerStateEnum.Ingame;
+      player.chips = this.SETTING_CHIPS;
       player.cards = this.cardset.drawMultiple(5);
     }
     for (let i = this.players.length - 1; i > 0; i--) {
@@ -44,7 +57,7 @@ export class Session implements ISession {
       throw new Error(Errors.ERR_USERNAME_TOO_SHORT);
     }
 
-    if (this.players.length >= this.maxPlayers) {
+    if (this.players.length >= this.SETTING_MAX_PLAYERS) {
       throw new Error(Errors.ERR_MAX_PLAYERS);
     }
 
@@ -60,7 +73,7 @@ export class Session implements ISession {
       username,
       ip,
       this.cardset.drawMultiple(5),
-      this.chips
+      this.SETTING_CHIPS
     );
     await newPlayer.getImageUrl();
     if (this.players.length === 0) {
@@ -79,42 +92,37 @@ export class Session implements ISession {
   }
 
   nextTurn() {
-    if (this.doubleTurn) {
+    if (this.doubleTurn && this.doubleTurnActivator != this.turn) {
       this.doubleTurn = false;
       return;
     }
-
     if (!this.reverse) {
       this.turn < this.players.length ? this.turn++ : (this.turn = 0);
     } else {
       this.turn >= 0 ? this.turn-- : (this.turn = this.players.length);
     }
-
     this.players.map((player: IPlayer) => (player.turn = false));
     this.players[this.turn].turn = true;
   }
 
-  changeDirection() {
-    this.reverse = !this.reverse;
-  }
-
-  playCard(session: Session, player: Player, card: Card) {
+  playCard(player: Player, card: Card) {
     switch (card.type) {
-      case CardType.Normal: {
-        session.count += card?.value || 0;
+      case CardTypeEnum.Normal: {
+        this.playNormalCard(player, card);
         break;
       }
-      case CardType.Double: {
-        // TODO Double Turn
+      case CardTypeEnum.Double: {
+        this.playDoubleTurn();
         break;
       }
-      case CardType.ChangeDirection: {
-        this.changeDirection();
+      case CardTypeEnum.ChangeDirection: {
+        this.playChangeDirection();
         break;
       }
     }
     player.cards.splice(player.cards.indexOf(card), 1);
-    session.cardset.playCard(card);
+    this.cardset.playCard(card);
+    this.checkGameOver(player);
   }
 
   removePlayer(player: Player): void {
@@ -134,11 +142,41 @@ export class Session implements ISession {
     return session;
   }
 
-  refillDeck(player: Player) {
+  refillPlayerCards(player: Player) {
     for (let i = player.cards.length; i < 5; i++) {
       const drawedcard = this.cardset.draw();
       if (drawedcard) {
         player.cards.push(drawedcard);
+      }
+    }
+  }
+
+  private playNormalCard(player: Player, card: Card) {
+    this.count += card?.value || 0;
+  }
+
+  private playChangeDirection() {
+    this.reverse = !this.reverse;
+  }
+
+  private playDoubleTurn() {
+    this.doubleTurn = true;
+    this.doubleTurnActivator = this.turn;
+  }
+
+  private checkGameOver(player: Player) {
+    if (this.count >= this.SETTING_MAX_COUNT) {
+      player.chips--;
+      if (player.chips <= 0) {
+        this.cardset.returnCards(player.cards);
+        player.state = PlayerStateEnum.Loser;
+      }
+      const playersIngame = this.players.filter(
+        (player: Player) => player.state == PlayerStateEnum.Ingame
+      );
+      if (playersIngame.length == 1) {
+        playersIngame[0].state = PlayerStateEnum.Winner;
+        this.state = SessionStateEnum.Finished;
       }
     }
   }

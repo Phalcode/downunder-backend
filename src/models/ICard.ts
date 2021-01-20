@@ -1,8 +1,8 @@
-import { CardType } from "./CardTypes";
+import { CardTypeEnum } from "./CardTypeEnum";
 
 export interface ICard {
     readonly id: string
-    readonly type: CardType;
+    readonly type: CardTypeEnum;
     readonly description: string;
     readonly value?: number;
     readonly source?: string;

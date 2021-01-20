@@ -10,7 +10,7 @@ const sessions: Session[] = [];
 // Create a new session
 router.post("/session", (request: Request, response: Response) => {
   const session = request.body as ISession;
-  const newSession = new Session(session.name, session.chips, session.maxPlayers);
+  const newSession = new Session(session.SETTING_NAME, session.SETTING_CHIPS, session.SETTING_MAX_PLAYERS);
   sessions.push(newSession);
   response.status(201).json(newSession);
 });
@@ -114,7 +114,7 @@ router.post("/session/:sessionId/player/:playerId/play/:cardid", (request: Reque
     response.status(401).send(`It is not your turn to play.`);
     return;
   }
-  session.playCard(session, player, card);
+  session.playCard(player, card);
   response.status(200).json(session.getStrippedSession(player.id));
 });
 
@@ -135,7 +135,7 @@ router.post("/session/:sessionId/player/:playerId/turn", (request: Request, resp
     return;
   }
   
-  session.refillDeck(player);
+  session.refillPlayerCards(player);
   session.nextTurn();
   response.status(200).json(session.getStrippedSession(player.id));
 });
