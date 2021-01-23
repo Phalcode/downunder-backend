@@ -1,8 +1,9 @@
 import { Card } from "./Card";
 import { CardTypeDescriptions } from "../models/CardTypeDescriptions";
 import { CardTypeEnum } from "../models/CardTypeEnum";
+import { ICardSet } from "../models/ICardSet";
 
-export class CardSet {
+export class CardSet implements ICardSet {
   cards: Card[] = [
     new Card(CardTypeEnum.Normal, CardTypeDescriptions.Normal, 76, "../../../assets/cards/76.svg"),
     new Card(CardTypeEnum.Normal, CardTypeDescriptions.Normal, 0, "../../../assets/cards/0.svg"),

@@ -1,6 +1,6 @@
-import { CardSet } from "../classes/CardSet";
 import { SessionStateEnum as SessionStateEnum } from "./SessionStateEnum";
 import { IPlayer } from "./IPlayer";
+import { ICardSet } from "./ICardSet";
 
 export interface ISession {
   readonly id?: string;
@@ -11,5 +11,5 @@ export interface ISession {
   count?: number;
   players?: IPlayer[];
   state?: SessionStateEnum;
-  cardset?: CardSet;
+  cardset?: ICardSet;
 }

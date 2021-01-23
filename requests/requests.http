@@ -20,4 +20,4 @@ POST    http://localhost:7777/session/:sessionId/player/:playerId/play/:cardid
 ### End Turn
 POST    http://localhost:7777/session/:sessionId/player/:playerId/turn
 ### Reset a session
-GET     http://localhost:7777/session/:sessionId/reset
+DELETE  http://localhost:7777/session/:sessionId/reset

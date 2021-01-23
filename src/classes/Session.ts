@@ -133,7 +133,7 @@ export class Session implements ISession {
   getStrippedSession(playerId: string): ISession {
     const session: ISession = JSON.parse(JSON.stringify(this));
     session.players?.map((player: IPlayer) => {
-      delete session?.cardset;
+      delete session?.cardset?.cards;
       if (player.id !== playerId) {
         delete player.cards;
         delete player.id;
