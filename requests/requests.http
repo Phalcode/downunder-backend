@@ -17,7 +17,5 @@ DELETE  http://localhost:7777/session/:sessionId/player/:playerId
 GET     http://localhost:7777/session/:sessionId/player/:playerId/draw
 ### Play a card
 POST    http://localhost:7777/session/:sessionId/player/:playerId/play/:cardid
-### End Turn
-POST    http://localhost:7777/session/:sessionId/player/:playerId/turn
 ### Reset a session
 DELETE  http://localhost:7777/session/:sessionId/reset

@@ -92,6 +92,7 @@ export class Session implements ISession {
   }
 
   nextTurn() {
+    const wasDoubleTurn = this.doubleTurn;
     if (this.doubleTurn && this.doubleTurnActivator != this.turn) {
       this.doubleTurn = false;
       return;
@@ -103,7 +104,12 @@ export class Session implements ISession {
     }
     this.players.map((player: IPlayer) => (player.turn = false));
     this.players[this.turn].turn = true;
+
+    //SKIP LOSERS KEEP DOUBLE TURNS
     if (this.players[this.turn].state === PlayerStateEnum.Loser) {
+      if (wasDoubleTurn) {
+        this.doubleTurn = true;
+      }
       this.nextTurn();
     }
   }
@@ -172,6 +178,7 @@ export class Session implements ISession {
       player.chips--;
       if (player.chips <= 0) {
         this.cardset.returnCards(player.cards);
+        this.doubleTurn = false;
         player.state = PlayerStateEnum.Loser;
       }
       const playersIngame = this.players.filter(

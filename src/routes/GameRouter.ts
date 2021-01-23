@@ -121,30 +121,6 @@ router.post("/session/:sessionId/player/:playerId/play/:cardid", (request: Reque
     return;
   }
   session.playCard(player, card);
-  response.status(200).json(session.getStrippedSession(player.id));
-});
-
-// End Turn
-router.post("/session/:sessionId/player/:playerId/turn", (request: Request, response: Response) => {
-  const session = sessions.find((session) => session.id === request.params.sessionId);
-  if (!session) {
-    response.status(404).send(`Session with the id ${request.params.sessionId} could not be found`);
-    return;
-  }
-  const player = session?.players.find((player) => player.id === request.params.playerId);
-  if (!player) {
-    response.status(404).send(`Player with the id ${request.params.playerId} could not be found`);
-    return;
-  }
-  if (!player.turn) {
-    response.status(403).send(Errors.ERR_NOT_YOUR_TURN);
-    return;
-  }
-  if(player.state === PlayerStateEnum.Loser) {
-    response.status(403).send(Errors.ERR_LOST);
-    return;
-  }
-  
   session.refillPlayerCards(player);
   session.nextTurn();
   response.status(200).json(session.getStrippedSession(player.id));
