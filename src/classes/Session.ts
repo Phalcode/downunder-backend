@@ -176,12 +176,22 @@ export class Session implements ISession {
 
   private checkGameOver(player: Player) {
     if (this.count >= this.SETTING_MAX_COUNT) {
+      //Check Round Over
       player.chips--;
       if (player.chips <= 0) {
         this.cardset.returnCards(player.cards);
         this.doubleTurn = false;
         player.state = PlayerStateEnum.Loser;
       }
+
+      // Reset Round
+      this.count = 0;
+      this.cardset = new CardSet();
+      for (const player of this.players) {
+        player.cards = this.cardset.drawMultiple(5);
+      }
+      
+      // Check Gamover
       const playersIngame = this.players.filter(
         (player: Player) => player.state == PlayerStateEnum.Ingame
       );
