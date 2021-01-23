@@ -3,6 +3,8 @@ import { ISession } from "../models/ISession";
 import { Session } from "../classes/Session";
 import { IPlayer } from "../models/IPlayer";
 import { Errors } from "../models/Errors";
+import { SessionStateEnum } from "../models/SessionStateEnum";
+import { PlayerStateEnum } from "../models/PlayerStateEnum";
 
 const router = express.Router();
 const sessions: Session[] = [];
@@ -114,6 +116,10 @@ router.post("/session/:sessionId/player/:playerId/play/:cardid", (request: Reque
     response.status(401).send(`It is not your turn to play.`);
     return;
   }
+  if(player.state === PlayerStateEnum.Loser) {
+    response.status(403).send(Errors.ERR_LOST);
+    return;
+  }
   session.playCard(player, card);
   response.status(200).json(session.getStrippedSession(player.id));
 });
@@ -134,6 +140,10 @@ router.post("/session/:sessionId/player/:playerId/turn", (request: Request, resp
     response.status(403).send(Errors.ERR_NOT_YOUR_TURN);
     return;
   }
+  if(player.state === PlayerStateEnum.Loser) {
+    response.status(403).send(Errors.ERR_LOST);
+    return;
+  }
   
   session.refillPlayerCards(player);
   session.nextTurn();
@@ -143,6 +153,10 @@ router.post("/session/:sessionId/player/:playerId/turn", (request: Request, resp
 // Reset a session
 router.delete("/session/:sessionId/reset", (request: Request, response: Response) => {
   const session = sessions.find((session) => session.id === request.params.sessionId);
+  if (session?.state !== SessionStateEnum.Finished) {
+    response.status(403).send(Errors.ERR_SESSION_STILL_ONGOING);
+    return;
+  }
   session?.reset();
   response.status(200);
 });

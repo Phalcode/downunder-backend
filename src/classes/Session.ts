@@ -103,6 +103,9 @@ export class Session implements ISession {
     }
     this.players.map((player: IPlayer) => (player.turn = false));
     this.players[this.turn].turn = true;
+    if (this.players[this.turn].state === PlayerStateEnum.Loser) {
+      this.nextTurn();
+    }
   }
 
   playCard(player: Player, card: Card) {
