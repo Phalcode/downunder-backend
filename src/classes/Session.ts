@@ -92,6 +92,7 @@ export class Session implements ISession {
   }
 
   nextTurn() {
+    if (this.players.length == 1) return;
     const wasDoubleTurn = this.doubleTurn;
     if (this.doubleTurn && this.doubleTurnActivator != this.turn) {
       this.doubleTurn = false;
