@@ -98,11 +98,13 @@ export class Session implements ISession {
       this.doubleTurn = false;
       return;
     }
+    console.log("The Turn is currently: " + this.turn);
     if (!this.reverse) {
       this.turn < this.players.length - 1 ? this.turn++ : (this.turn = 0);
     } else {
       this.turn > 0 ? this.turn-- : (this.turn = this.players.length - 1);
     }
+    console.log("The Turn is now: " + this.turn);
     this.players.map((player: IPlayer) => (player.turn = false));
     this.players[this.turn].turn = true;
 
@@ -191,7 +193,7 @@ export class Session implements ISession {
         player.cards = this.cardset.drawMultiple(5);
       }
 
-      // Check Gamover
+      // Check Gameover
       const playersIngame = this.players.filter(
         (player: Player) => player.state == PlayerStateEnum.Ingame
       );
