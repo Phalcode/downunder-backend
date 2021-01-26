@@ -10,14 +10,17 @@ dotenv.config();
 
 const port = process.env.PORT || 80;
 const app: express.Application = express();
+const corsOptions = {
+  origin: "https://downunder-client.platform.alfagun74.de",
+  optionsSuccessStatus: 200,
+};
 
 app.use(helmet());
 app.use(logger("dev"));
 app.use(express.json());
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-
 
 app.use("/", GameRouter);
 app.use(notFoundHandler);
