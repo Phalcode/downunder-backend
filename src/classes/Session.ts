@@ -99,9 +99,9 @@ export class Session implements ISession {
       return;
     }
     if (!this.reverse) {
-      this.turn < this.players.length ? this.turn++ : (this.turn = 0);
+      this.turn < this.players.length - 1 ? this.turn++ : (this.turn = 0);
     } else {
-      this.turn >= 0 ? this.turn-- : (this.turn = this.players.length);
+      this.turn > 0 ? this.turn-- : (this.turn = this.players.length - 1);
     }
     this.players.map((player: IPlayer) => (player.turn = false));
     this.players[this.turn].turn = true;
@@ -190,7 +190,7 @@ export class Session implements ISession {
       for (const player of this.players) {
         player.cards = this.cardset.drawMultiple(5);
       }
-      
+
       // Check Gamover
       const playersIngame = this.players.filter(
         (player: Player) => player.state == PlayerStateEnum.Ingame
