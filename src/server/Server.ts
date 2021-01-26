@@ -8,7 +8,7 @@ import * as dotenv from "dotenv";
 import { errorHandler, notFoundHandler } from "../routes/ErrorHandler";
 dotenv.config();
 
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || 80;
 const app: express.Application = express();
 
 app.use(helmet());
