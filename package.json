@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "start": "npm run build && npm run serve",
-    "prebuild": "npm --no-git-tag-version version patch",
+    "deploy": "npm --no-git-tag-version version patch",
     "build": "tsc",
     "serve": "node ./bin/server/Server.js"
   },
