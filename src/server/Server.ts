@@ -27,5 +27,9 @@ app.use(notFoundHandler);
 app.use(errorHandler);
 
 app.listen(port, () => {
-  console.log(`7️⃣ 7️⃣  Lowbob 77 Server started on Port ${port}`);
+  console.log(
+    `7️⃣ 7️⃣  Lowbob 77 Server ${
+      require("../../package.json").version
+    } started on Port ${port}`
+  );
 });

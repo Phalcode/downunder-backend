@@ -1,12 +1,13 @@
 {
   "name": "downunder-server",
-  "version": "1.0.0",
+  "version": "0.0.2",
   "description": "Backend Server for Lowbob 77 Game",
   "private": true,
   "main": "index.js",
   "scripts": {
-    "start": "npm run compile && npm run serve",
-    "compile": "tsc",
+    "start": "npm run build && npm run serve",
+    "prebuild": "npm --no-git-tag-version version patch",
+    "build": "tsc",
     "serve": "node ./bin/server/Server.js"
   },
   "authors": [
