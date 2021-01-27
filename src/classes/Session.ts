@@ -163,6 +163,17 @@ export class Session implements ISession {
     }
   }
 
+  checkIfSessionBegan(): boolean {
+    if (
+      this.players.find((player) => player.chips < this.SETTING_CHIPS) ||
+      this.cardset.playedCards.length > 0
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   private playNormalCard(player: Player, card: Card) {
     this.count += card?.value || 0;
   }

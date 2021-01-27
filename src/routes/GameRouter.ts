@@ -29,22 +29,14 @@ router.get(
       (session) => session.id === request.params.sessionId
     );
     if (!session) {
-      response
-        .status(404)
-        .send(
-          `Session with the id ${request.params.sessionId} could not be found`
-        );
+      response.status(404).send(Errors.ERR_SESSION_NOT_FOUND);
       return;
     }
     const player = session?.players.find(
       (player) => player.id === request.params.playerId
     );
     if (!player) {
-      response
-        .status(404)
-        .send(
-          `Player with the id ${request.params.playerId} could not be found`
-        );
+      response.status(404).send(Errors.ERR_PLAYER_NOT_FOUND);
       return;
     }
     response.status(200).json(session.getStrippedSession(player.id));
@@ -57,11 +49,7 @@ router.delete("/session/:sessionId", (request: Request, response: Response) => {
     (session) => session.id === request.params.sessionId
   );
   if (!session) {
-    response
-      .status(404)
-      .send(
-        `Session with the id ${request.params.sessionId} could not be found`
-      );
+    response.status(404).send(Errors.ERR_SESSION_NOT_FOUND);
     return;
   }
   sessions.splice(sessions.indexOf(session), 1);
@@ -76,11 +64,11 @@ router.post(
       (session) => session.id === request.params.sessionId
     );
     if (!session) {
-      response
-        .status(404)
-        .send(
-          `Session with the id ${request.params.sessionId} could not be found`
-        );
+      response.status(404).send(Errors.ERR_SESSION_NOT_FOUND);
+      return;
+    }
+    if (session.checkIfSessionBegan()) {
+      response.status(403).send(Errors.ERR_SESSION_ALREADY_STARTED);
       return;
     }
     try {
@@ -90,15 +78,12 @@ router.post(
     } catch (error) {
       switch (error.message as Errors) {
         case Errors.ERR_MAX_PLAYERS:
-          // TODO: HTTP ERROR IN YAML
           response.status(401).send(Errors.ERR_MAX_PLAYERS);
           break;
         case Errors.ERR_SAME_USERNAME:
-          // TODO: HTTP ERROR IN YAML
           response.status(401).send(Errors.ERR_SAME_USERNAME);
           break;
         case Errors.ERR_USERNAME_TOO_SHORT:
-          // TODO: HTTP ERROR IN YAML
           response.status(400).send(Errors.ERR_USERNAME_TOO_SHORT);
           break;
         default:
@@ -117,22 +102,14 @@ router.delete(
       (session) => session.id === request.params.sessionId
     );
     if (!session) {
-      response
-        .status(404)
-        .send(
-          `Session with the id ${request.params.sessionId} could not be found`
-        );
+      response.status(404).send(Errors.ERR_SESSION_NOT_FOUND);
       return;
     }
     const player = session?.players.find(
       (player) => player.id === request.params.playerId
     );
     if (!player) {
-      response
-        .status(404)
-        .send(
-          `Player with the id ${request.params.playerId} could not be found`
-        );
+      response.status(404).send(Errors.ERR_PLAYER_NOT_FOUND);
       return;
     }
     session.players.splice(session.players.indexOf(player), 1);
@@ -149,22 +126,14 @@ router.post(
       (session) => session.id === request.params.sessionId
     );
     if (!session) {
-      response
-        .status(404)
-        .send(
-          `Session with the id ${request.params.sessionId} could not be found`
-        );
+      response.status(404).send(Errors.ERR_SESSION_NOT_FOUND);
       return;
     }
     const player = session?.players.find(
       (player) => player.id === request.params.playerId
     );
     if (!player) {
-      response
-        .status(404)
-        .send(
-          `Player with the id ${request.params.playerId} could not be found`
-        );
+      response.status(404).send(Errors.ERR_PLAYER_NOT_FOUND);
       return;
     }
     if (!player.turn) {
@@ -175,30 +144,20 @@ router.post(
       (card) => card.id === request.params.cardid
     );
     if (!card) {
-      response
-        .status(404)
-        .send(`Card with the id ${request.params.cardid} could not be found`);
+      response.status(404).send(Errors.ERR_CARD_NOT_FOUND);
       return;
     }
     if (session.turn !== session.players.indexOf(player)) {
-      response.status(401).send(`It is not your turn to play.`);
+      response.status(401).send(Errors.ERR_NOT_YOUR_TURN);
       return;
     }
     if (player.state === PlayerStateEnum.Loser) {
       response.status(403).send(Errors.ERR_LOST);
       return;
     }
-    let end = Date.now();
-    console.log(`Execution Checks: ${end - start} ms`);
     session.playCard(player, card);
-    end = Date.now();
-    console.log(`Execution Card Play: ${end - start} ms`);
     session.refillPlayerCards(player);
-    end = Date.now();
-    console.log(`Execution Refill: ${end - start} ms`);
     session.nextTurn();
-    end = Date.now();
-    console.log(`Execution Next Turn: ${end - start} ms`);
     response.status(200).json(session.getStrippedSession(player.id));
   }
 );
