@@ -12,6 +12,6 @@ export class Card implements ICard {
         this.type = type;
         this.description = description;
         this.source = source;
-        if (type == CardTypeEnum.Normal && value) this.value = value;
+        if (type === CardTypeEnum.Normal && value) this.value = value;
     }
 };

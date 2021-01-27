@@ -63,7 +63,7 @@ export class Session implements ISession {
 
     if (
       this.players.find(
-        (player) => player.username.toLowerCase() == username.toLowerCase()
+        (player) => player.username.toLowerCase() === username.toLowerCase()
       )
     ) {
       throw new Error(Errors.ERR_SAME_USERNAME);
@@ -92,9 +92,9 @@ export class Session implements ISession {
   }
 
   nextTurn() {
-    if (this.players.length == 1) return;
+    if (this.players.length === 1) return;
     const wasDoubleTurn = this.doubleTurn;
-    if (this.doubleTurn && this.doubleTurnActivator != this.turn) {
+    if (this.doubleTurn && this.doubleTurnActivator !== this.turn) {
       this.doubleTurn = false;
       return;
     }
@@ -206,9 +206,9 @@ export class Session implements ISession {
 
       // Check Gameover
       const playersIngame = this.players.filter(
-        (player: Player) => player.state == PlayerStateEnum.Ingame
+        (player: Player) => player.state === PlayerStateEnum.Ingame
       );
-      if (playersIngame.length == 1) {
+      if (playersIngame.length === 1) {
         playersIngame[0].state = PlayerStateEnum.Winner;
         this.state = SessionStateEnum.Finished;
       }

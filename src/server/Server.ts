@@ -2,7 +2,7 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
 import GameRouter from "../routes/GameRouter";
-import cors from "cors";
+import cors, { CorsOptions } from "cors";
 import helmet from "helmet";
 import * as dotenv from "dotenv";
 import { errorHandler, notFoundHandler } from "../routes/ErrorHandler";
@@ -10,8 +10,8 @@ dotenv.config();
 
 const port = process.env.PORT || 80;
 const app: express.Application = express();
-const corsOptions = {
-  origin: "https://downunder-client.platform.alfagun74.de",
+const corsOptions: CorsOptions = {
+  origin: /(https:\/\/downunder-client.platform.alfagun74.de|http:\/\/localhost)/,
   optionsSuccessStatus: 200,
 };
 
