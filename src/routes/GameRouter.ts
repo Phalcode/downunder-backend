@@ -128,8 +128,8 @@ router.post(
       response.status(404).send(Errors.ERR_SESSION_NOT_FOUND);
       return;
     }
-    if (session.players.length > 1) {
-      response.status(404).send(Errors.ERR_ALONE);
+    if (session.players.length < 2) {
+      response.status(403).send(Errors.ERR_ALONE);
       return;
     }
     const player = session?.players.find(
