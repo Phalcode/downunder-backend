@@ -121,12 +121,15 @@ router.delete(
 router.post(
   "/session/:sessionId/player/:playerId/play/:cardid",
   (request: Request, response: Response) => {
-    let start = Date.now();
     const session = sessions.find(
       (session) => session.id === request.params.sessionId
     );
     if (!session) {
       response.status(404).send(Errors.ERR_SESSION_NOT_FOUND);
+      return;
+    }
+    if (session.players.length > 1) {
+      response.status(404).send(Errors.ERR_ALONE);
       return;
     }
     const player = session?.players.find(

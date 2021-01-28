@@ -99,13 +99,11 @@ export class Session implements ISession {
       this.doubleTurn = false;
       return;
     }
-    console.log("The Turn is currently: " + this.turn);
     if (!this.reverse) {
       this.turn < this.players.length - 1 ? this.turn++ : (this.turn = 0);
     } else {
       this.turn > 0 ? this.turn-- : (this.turn = this.players.length - 1);
     }
-    console.log("The Turn is now: " + this.turn);
     this.players.map((player: IPlayer) => (player.turn = false));
     this.players[this.turn].turn = true;
 
@@ -194,6 +192,7 @@ export class Session implements ISession {
       player.chips--;
       if (player.chips <= 0) {
         this.cardset.returnCards(player.cards);
+        player.cards = [];
         this.doubleTurn = false;
         player.state = PlayerStateEnum.Loser;
       }
@@ -202,7 +201,8 @@ export class Session implements ISession {
       this.count = 0;
       this.cardset = new CardSet();
       for (const player of this.players) {
-        player.cards = this.cardset.drawMultiple(5);
+        if (player.state === PlayerStateEnum.Ingame)
+          player.cards = this.cardset.drawMultiple(5);
       }
 
       // Check Gameover

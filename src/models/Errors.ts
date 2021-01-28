@@ -8,5 +8,6 @@ export enum Errors {
   ERR_SESSION_ALREADY_STARTED = "The players in this session already began to play.",
   ERR_SESSION_NOT_FOUND = "This session could not be found.",
   ERR_PLAYER_NOT_FOUND = "This player could not be found.",
-  ERR_CARD_NOT_FOUND = "This card could not be found."
+  ERR_CARD_NOT_FOUND = "This card could not be found.",
+  ERR_ALONE="You can not play when you're alone."
 }
