@@ -92,10 +92,10 @@ export class Session implements ISession {
     }
   }
 
-  nextTurn() {
+  nextTurn(skip: boolean = false) {
     if (this.players.length === 1) return;
     const wasDoubleTurn = this.doubleTurn;
-    if (this.doubleTurn && this.doubleTurnActivator !== this.turn) {
+    if (this.doubleTurn && this.doubleTurnActivator !== this.turn && !skip) {
       this.doubleTurn = false;
       return;
     }
@@ -114,7 +114,7 @@ export class Session implements ISession {
       if (wasDoubleTurn) {
         this.doubleTurn = true;
       }
-      this.nextTurn();
+      this.nextTurn(true);
     }
   }
 
