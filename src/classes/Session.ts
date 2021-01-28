@@ -43,6 +43,7 @@ export class Session implements ISession {
       await player.getImageUrl();
       player.state = PlayerStateEnum.Ingame;
       player.chips = this.SETTING_CHIPS;
+      player.turn = false;
       player.cards = this.cardset.drawMultiple(5);
     }
     for (let i = this.players.length - 1; i > 0; i--) {

@@ -18,4 +18,4 @@ GET     http://localhost:7777/session/:sessionId/player/:playerId/draw
 ### Play a card
 POST    http://localhost:7777/session/:sessionId/player/:playerId/play/:cardid
 ### Reset a session
-DELETE  http://localhost:7777/session/:sessionId/reset
+DELETE  https://downunder-server.platform.alfagun74.de/session/rcmJV/reset
