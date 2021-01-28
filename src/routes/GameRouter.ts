@@ -140,7 +140,7 @@ router.post(
       return;
     }
     if (!player.turn) {
-      response.status(403).send(new Error(Errors.ERR_NOT_YOUR_TURN));
+      response.status(403).send(Errors.ERR_NOT_YOUR_TURN);
       return;
     }
     const card = player?.cards.find(
@@ -148,10 +148,6 @@ router.post(
     );
     if (!card) {
       response.status(404).send(Errors.ERR_CARD_NOT_FOUND);
-      return;
-    }
-    if (session.turn !== session.players.indexOf(player)) {
-      response.status(401).send(Errors.ERR_NOT_YOUR_TURN);
       return;
     }
     if (player.state === PlayerStateEnum.Loser) {

@@ -190,10 +190,12 @@ export class Session implements ISession {
     if (this.count >= this.SETTING_MAX_COUNT) {
       //Check Round Over
       player.chips--;
+      this.doubleTurn = false;
+
+      // Remove one Player
       if (player.chips <= 0) {
         this.cardset.returnCards(player.cards);
         player.cards = [];
-        this.doubleTurn = false;
         player.state = PlayerStateEnum.Loser;
       }
 
