@@ -10,6 +10,11 @@
     "build": "tsc",
     "serve": "node ./bin/server/Server.js"
   },
+  "husky": {
+    "hooks": {
+      "pre-push": "npm run deploy"
+    }
+  },
   "authors": [
     "Alfagun74"
   ],
@@ -26,6 +31,7 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "helmet": "^4.4.1",
+    "husky": "^4.3.8",
     "morgan": "^1.10.0",
     "nanoid": "^3.1.20",
     "node-cache": "^5.1.2",
