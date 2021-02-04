@@ -8,9 +8,6 @@ import { Errors } from "../models/Errors";
 import { IPlayer } from "../models/IPlayer";
 import { PlayerStateEnum } from "../models/PlayerStateEnum";
 import { SessionStateEnum } from "../models/SessionStateEnum";
-import { textChangeRangeIsUnchanged } from "typescript";
-import { delete } from "../routes/GameRouter";
-
 export class Session implements ISession {
   readonly id = nanoid(5);
   readonly SETTING_NAME: string;
