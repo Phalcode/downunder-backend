@@ -18,4 +18,4 @@ GET     https://downunder-server.platform.alfagun74.de/session/:sessionId/player
 ### Play a card
 POST    https://downunder-server.platform.alfagun74.de/session/:sessionId/player/:playerId/play/:cardid
 ### Reset a session
-DELETE  https://downunder-server.platform.alfagun74.de/session/rcmJV/reset
+DELETE  https://downunder-server.platform.alfagun74.de/session/:sessionId/reset

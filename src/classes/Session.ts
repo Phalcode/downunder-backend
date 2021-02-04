@@ -8,6 +8,8 @@ import { Errors } from "../models/Errors";
 import { IPlayer } from "../models/IPlayer";
 import { PlayerStateEnum } from "../models/PlayerStateEnum";
 import { SessionStateEnum } from "../models/SessionStateEnum";
+import { textChangeRangeIsUnchanged } from "typescript";
+import { delete } from "../routes/GameRouter";
 
 export class Session implements ISession {
   readonly id = nanoid(5);
@@ -22,6 +24,7 @@ export class Session implements ISession {
   turn: number = 0;
   doubleTurn: boolean = false;
   reverse: boolean = false;
+  pasch: boolean = false;
   private doubleTurnActivator: number = -1;
 
   constructor(
@@ -39,6 +42,11 @@ export class Session implements ISession {
   async reset() {
     this.cardset = new CardSet();
     this.state = SessionStateEnum.Running;
+    this.count = 0;
+    this.turn = 0;
+    this.doubleTurn = false;
+    this.reverse = false;
+    this.pasch = false;
     for (const player of this.players) {
       await player.getImageUrl();
       player.state = PlayerStateEnum.Ingame;
@@ -119,7 +127,7 @@ export class Session implements ISession {
   playCard(player: Player, card: Card) {
     switch (card.type) {
       case CardTypeEnum.Normal: {
-        this.playNormalCard(player, card);
+        this.playNormalCard(card);
         break;
       }
       case CardTypeEnum.Double: {
@@ -133,7 +141,7 @@ export class Session implements ISession {
     }
     player.cards.splice(player.cards.indexOf(card), 1);
     this.cardset.playCard(card);
-    this.checkGameOver(player);
+    this.roundOver(player);
   }
 
   removePlayer(player: Player): void {
@@ -173,8 +181,12 @@ export class Session implements ISession {
     }
   }
 
-  private playNormalCard(player: Player, card: Card) {
+  private playNormalCard(card: Card) {
     this.count += card?.value || 0;
+
+    if (this.count % 11 === 0 && card?.value != 0) {
+      this.pasch = true;
+    }
   }
 
   private playChangeDirection() {
@@ -186,11 +198,12 @@ export class Session implements ISession {
     this.doubleTurnActivator = this.turn;
   }
 
-  private checkGameOver(player: Player) {
-    if (this.count >= this.SETTING_MAX_COUNT) {
+  private roundOver(player: Player) {
+    if (this.count >= this.SETTING_MAX_COUNT || this.pasch) {
       //Check Round Over
       player.chips--;
       this.doubleTurn = false;
+      this.pasch = false;
 
       // Remove one Player
       if (player.chips <= 0) {
@@ -203,8 +216,9 @@ export class Session implements ISession {
       this.count = 0;
       this.cardset = new CardSet();
       for (const player of this.players) {
-        if (player.state === PlayerStateEnum.Ingame)
+        if (player.state === PlayerStateEnum.Ingame) {
           player.cards = this.cardset.drawMultiple(5);
+        }
       }
 
       // Check Gameover
