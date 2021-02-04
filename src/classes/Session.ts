@@ -200,7 +200,6 @@ export class Session implements ISession {
       //Check Round Over
       player.chips--;
       this.doubleTurn = false;
-      this.pasch = false;
 
       // Remove one Player
       if (player.chips <= 0) {
@@ -209,14 +208,18 @@ export class Session implements ISession {
         player.state = PlayerStateEnum.Loser;
       }
 
-      // Reset Round
-      this.count = 0;
-      this.cardset = new CardSet();
-      for (const player of this.players) {
-        if (player.state === PlayerStateEnum.Ingame) {
-          player.cards = this.cardset.drawMultiple(5);
+      if (!this.pasch) {
+        // Reset Round
+        this.count = 0;
+        this.cardset = new CardSet();
+        for (const player of this.players) {
+          if (player.state === PlayerStateEnum.Ingame) {
+            player.cards = this.cardset.drawMultiple(5);
+          }
         }
       }
+      
+      this.pasch = false;
 
       // Check Gameover
       const playersIngame = this.players.filter(
