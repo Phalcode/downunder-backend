@@ -8,7 +8,10 @@ import { Errors } from "../models/Errors";
 import { IPlayer } from "../models/IPlayer";
 import { PlayerStateEnum } from "../models/PlayerStateEnum";
 import { SessionStateEnum } from "../models/SessionStateEnum";
+import events from "events";
+
 export class Session implements ISession {
+  readonly stream: events.EventEmitter;
   readonly id = nanoid(5);
   readonly SETTING_NAME: string;
   readonly SETTING_CHIPS: number;
@@ -25,11 +28,13 @@ export class Session implements ISession {
   private doubleTurnActivator: number = -1;
 
   constructor(
+    stream: events.EventEmitter,
     SETTING_NAME: string,
     SETTING_CHIPS = 3,
     SETTING_MAX_PLAYERS = 8,
     SETTING_MAX_COUNT = 77
   ) {
+    this.stream = stream;
     this.SETTING_NAME = SETTING_NAME;
     this.SETTING_CHIPS = SETTING_CHIPS;
     this.SETTING_MAX_PLAYERS = SETTING_MAX_PLAYERS;
@@ -218,7 +223,7 @@ export class Session implements ISession {
           }
         }
       }
-      
+
       this.pasch = false;
 
       // Check Gameover
@@ -229,6 +234,13 @@ export class Session implements ISession {
         playersIngame[0].state = PlayerStateEnum.Winner;
         this.state = SessionStateEnum.Finished;
       }
+    }
+  }
+
+  pushSessionToAllPlayers() {
+    for (const player of this.players) {
+      this.stream.emit(`${this.id}-${player.id}`, "message", this.getStrippedSession(player.id));
+      console.log(`Pushed data to ${this.id}-${player.id}`);
     }
   }
 }

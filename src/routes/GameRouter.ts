@@ -1,4 +1,5 @@
 import express, { Request, Response } from "express";
+import events from "events";
 import { ISession } from "../models/ISession";
 import { Session } from "../classes/Session";
 import { IPlayer } from "../models/IPlayer";
@@ -8,11 +9,13 @@ import { PlayerStateEnum } from "../models/PlayerStateEnum";
 
 const router = express.Router();
 const sessions: Session[] = [];
+const stream = new events.EventEmitter();
 
 // Create a new session
 router.post("/session", (request: Request, response: Response) => {
   const session = request.body as ISession;
   const newSession = new Session(
+    stream,
     session.SETTING_NAME,
     session.SETTING_CHIPS,
     session.SETTING_MAX_PLAYERS
@@ -39,7 +42,16 @@ router.get(
       response.status(404).send(Errors.ERR_PLAYER_NOT_FOUND);
       return;
     }
-    response.status(200).json(session.getStrippedSession(player.id));
+    console.log(`fetching ${session.id}-${player.id}`);
+    response.writeHead(200, {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache",
+      Connection: "keep-alive"
+    });
+    stream.on(`${session.id}-${player.id}`, (event: string, data: object) => {
+      response.write(`event:${event}\ndata:${JSON.stringify(data)}\n\n`);
+    });
+    session.pushSessionToAllPlayers();
   }
 );
 
@@ -75,6 +87,7 @@ router.post(
       const playerRequest = request.body as IPlayer;
       const player = await session?.join(playerRequest.username, request.ip);
       response.status(201).json(player);
+      session.pushSessionToAllPlayers();
     } catch (error) {
       switch (error.message as Errors) {
         case Errors.ERR_MAX_PLAYERS:
@@ -113,7 +126,8 @@ router.delete(
       return;
     }
     session.players.splice(session.players.indexOf(player), 1);
-    response.status(200).json(session.getStrippedSession(player.id));
+    response.status(200);
+    session.pushSessionToAllPlayers();
   }
 );
 
@@ -157,7 +171,8 @@ router.post(
     session.playCard(player, card);
     session.refillPlayerCards(player);
     session.nextTurn();
-    response.status(200).json(session.getStrippedSession(player.id));
+    response.status(200);
+    session.pushSessionToAllPlayers();
   }
 );
 
@@ -174,6 +189,7 @@ router.delete(
     }
     session?.reset();
     response.status(200);
+    session.pushSessionToAllPlayers();
   }
 );
 
