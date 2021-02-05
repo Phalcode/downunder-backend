@@ -9,6 +9,7 @@ import { IPlayer } from "../models/IPlayer";
 import { PlayerStateEnum } from "../models/PlayerStateEnum";
 import { SessionStateEnum } from "../models/SessionStateEnum";
 import events from "events";
+import { textChangeRangeIsUnchanged } from "typescript";
 
 export class Session implements ISession {
   readonly stream: events.EventEmitter;
@@ -233,13 +234,21 @@ export class Session implements ISession {
       if (playersIngame.length === 1) {
         playersIngame[0].state = PlayerStateEnum.Winner;
         this.state = SessionStateEnum.Finished;
+        this.count = 0;
+        for (let player of this.players) {
+          player.cards = [];
+        }
       }
     }
   }
 
   pushSessionToAllPlayers() {
     for (const player of this.players) {
-      this.stream.emit(`${this.id}-${player.id}`, "message", this.getStrippedSession(player.id));
+      this.stream.emit(
+        `${this.id}-${player.id}`,
+        "message",
+        this.getStrippedSession(player.id)
+      );
       console.log(`Pushed data to ${this.id}-${player.id}`);
     }
   }
