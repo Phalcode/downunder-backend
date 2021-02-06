@@ -245,6 +245,7 @@ export class Session implements ISession {
   }
 
   pushSessionToAllPlayers() {
+    if(this.players.length === 0) return;
     for (const player of this.players) {
       this.stream.emit(
         `${this.id}-${player.id}`,
