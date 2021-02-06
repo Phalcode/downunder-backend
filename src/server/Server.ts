@@ -11,7 +11,7 @@ dotenv.config();
 const port = process.env.PORT || 80;
 const app: express.Application = express();
 const corsOptions: CorsOptions = {
-  origin: /(https:\/\/downunder-client.platform.alfagun74.de|http:\/\/localhost)/,
+  origin: /(https:\/\/downunder.platform.alfagun74.de|https:\/\/downunder-test.platform.alfagun74.de|http:\/\/localhost)/,
   optionsSuccessStatus: 200,
 };
 
