@@ -245,14 +245,15 @@ export class Session implements ISession {
   }
 
   pushSessionToAllPlayers() {
-    if(this.players.length === 0) return;
-    for (const player of this.players) {
-      this.stream.emit(
-        `${this.id}-${player.id}`,
-        "message",
-        this.getStrippedSession(player.id)
-      );
-      console.log(`Pushed data to ${this.id}-${player.id}`);
+    if (this.players) {
+      for (const player of this.players) {
+        this.stream.emit(
+          `${this.id}-${player.id}`,
+          "message",
+          this.getStrippedSession(player.id)
+        );
+        console.log(`Pushed data to ${this.id}-${player.id}`);
+      }
     }
   }
 }
