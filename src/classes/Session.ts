@@ -41,7 +41,7 @@ export class Session implements ISession {
     this.SETTING_MAX_PLAYERS = SETTING_MAX_PLAYERS;
     this.SETTING_MAX_COUNT = SETTING_MAX_COUNT;
 
-    setInterval(this.pushSessionToAllPlayers, 1000);
+    setInterval(this.pushSessionToAllPlayers, 3000);
   }
 
   async reset() {
