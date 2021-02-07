@@ -46,12 +46,12 @@ router.get(
     response.writeHead(200, {
       "Content-Type": "text/event-stream",
       "Cache-Control": "no-cache",
-      Connection: "keep-alive"
+      Connection: "keep-alive",
     });
     stream.on(`${session.id}-${player.id}`, (event: string, data: object) => {
       response.write(`event:${event}\ndata:${JSON.stringify(data)}\n\n`);
     });
-    session.pushSessionToAllPlayers();
+    session.pushSession(player.id);
   }
 );
 
@@ -86,8 +86,8 @@ router.post(
     try {
       const playerRequest = request.body as IPlayer;
       const player = await session?.join(playerRequest.username, request.ip);
+      session.broadcastSession();
       response.status(201).json(player);
-      session.pushSessionToAllPlayers();
     } catch (error) {
       switch (error.message as Errors) {
         case Errors.ERR_MAX_PLAYERS:
@@ -126,8 +126,8 @@ router.delete(
       return;
     }
     session.players.splice(session.players.indexOf(player), 1);
+    session.broadcastSession();
     response.status(200);
-    session.pushSessionToAllPlayers();
   }
 );
 
@@ -171,8 +171,8 @@ router.post(
     session.playCard(player, card);
     session.refillPlayerCards(player);
     session.nextTurn();
+    session.broadcastSession();
     response.status(200);
-    session.pushSessionToAllPlayers();
   }
 );
 
@@ -188,8 +188,8 @@ router.delete(
       return;
     }
     session?.reset();
+    session.broadcastSession();
     response.status(200);
-    session.pushSessionToAllPlayers();
   }
 );
 
