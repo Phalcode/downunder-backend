@@ -41,7 +41,7 @@ export class Session implements ISession {
     this.SETTING_MAX_PLAYERS = SETTING_MAX_PLAYERS;
     this.SETTING_MAX_COUNT = SETTING_MAX_COUNT;
 
-    setInterval(this.pushSessionToAllPlayers, 3000);
+    setInterval(this.broadcastSession, 3000);
   }
 
   async reset() {
@@ -94,6 +94,9 @@ export class Session implements ISession {
       newPlayer.turn = true;
     }
     this.players.push(newPlayer);
+    console.log(
+      " HALLO1c: " + this.players + this.players.length + typeof this.players
+    );
     return newPlayer;
   }
 
@@ -244,16 +247,29 @@ export class Session implements ISession {
     }
   }
 
-  pushSessionToAllPlayers() {
-    if (this.players) {
-      for (const player of this.players) {
-        this.stream.emit(
-          `${this.id}-${player.id}`,
-          "message",
-          this.getStrippedSession(player.id)
-        );
-        console.log(`Pushed data to ${this.id}-${player.id}`);
-      }
+  broadcastSession() {
+    if (!this.players) {
+      return;
     }
+    console.log(
+      " HALLO: " + this.players + this.players.length + typeof this.players
+    );
+    this.players.map((player: Player) => {
+      this.stream.emit(
+        `${this.id}-${player.id}`,
+        "message",
+        this.getStrippedSession(player.id)
+      );
+      console.log(`Broadcasted session to ${this.id}-${player.id}`);
+    });
+  }
+
+  pushSession(playerId: string) {
+    this.stream.emit(
+      `${this.id}-${playerId}`,
+      "message",
+      this.getStrippedSession(playerId)
+    );
+    console.log(`Pushed session to ${this.id}-${playerId}`);
   }
 }

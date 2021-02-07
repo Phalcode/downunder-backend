@@ -24,7 +24,7 @@ router.post("/session", (request: Request, response: Response) => {
   response.status(201).json(newSession);
 });
 
-// Get game info
+// Stream Session
 router.get(
   "/session/:sessionId/player/:playerId",
   (request: Request, response: Response) => {
@@ -46,12 +46,38 @@ router.get(
     response.writeHead(200, {
       "Content-Type": "text/event-stream",
       "Cache-Control": "no-cache",
-      Connection: "keep-alive"
+      Connection: "keep-alive",
     });
     stream.on(`${session.id}-${player.id}`, (event: string, data: object) => {
       response.write(`event:${event}\ndata:${JSON.stringify(data)}\n\n`);
     });
-    session.pushSessionToAllPlayers();
+    session.pushSession(player.id);
+  }
+);
+
+// Handshake
+router.get(
+  "/session/:sessionId/player/:playerId/handshake",
+  (request: Request, response: Response) => {
+    const session = sessions.find(
+      (session) => session.id === request.params.sessionId
+    );
+    if (!session) {
+      response.status(404).send(Errors.ERR_SESSION_NOT_FOUND);
+      return;
+    }
+    const player = session?.players.find(
+      (player) => player.id === request.params.playerId
+    );
+    if (!player) {
+      response.status(404).send(Errors.ERR_PLAYER_NOT_FOUND);
+      return;
+    }
+    console.log(
+      `Received Handshake from ${session.id}-${player.id}, pushing session to their stream.`
+    );
+    session.pushSession(player.id);
+    response.status(200);
   }
 );
 
@@ -86,8 +112,8 @@ router.post(
     try {
       const playerRequest = request.body as IPlayer;
       const player = await session?.join(playerRequest.username, request.ip);
+      session.broadcastSession();
       response.status(201).json(player);
-      session.pushSessionToAllPlayers();
     } catch (error) {
       switch (error.message as Errors) {
         case Errors.ERR_MAX_PLAYERS:
@@ -126,8 +152,8 @@ router.delete(
       return;
     }
     session.players.splice(session.players.indexOf(player), 1);
+    session.broadcastSession();
     response.status(200);
-    session.pushSessionToAllPlayers();
   }
 );
 
@@ -171,8 +197,8 @@ router.post(
     session.playCard(player, card);
     session.refillPlayerCards(player);
     session.nextTurn();
+    session.broadcastSession();
     response.status(200);
-    session.pushSessionToAllPlayers();
   }
 );
 
@@ -188,8 +214,8 @@ router.delete(
       return;
     }
     session?.reset();
+    session.broadcastSession();
     response.status(200);
-    session.pushSessionToAllPlayers();
   }
 );
 
