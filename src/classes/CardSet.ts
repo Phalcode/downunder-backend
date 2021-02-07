@@ -1,5 +1,5 @@
 import { Card } from "./Card";
-import { CardTypeDescriptions } from "../models/CardTypeDescriptions";
+import { CardTypeDescriptions } from "../models/CardTypeDescriptionEnum";
 import { CardTypeEnum } from "../models/CardTypeEnum";
 import { ICardSet } from "../models/ICardSet";
 
