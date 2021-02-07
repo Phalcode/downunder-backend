@@ -208,19 +208,18 @@ export class Session implements ISession {
 
   private roundOver(player: Player) {
     if (this.count >= this.SETTING_MAX_COUNT || this.pasch) {
-      //Check Round Over
       player.chips--;
-      this.doubleTurn = false;
-
-      // Remove one Player
+      
+      // Remove player if necessary
       if (player.chips <= 0) {
         this.cardset.returnCards(player.cards);
         player.cards = [];
         player.state = PlayerStateEnum.Loser;
       }
-
+      
+      // Reset Round if necessary
       if (!this.pasch) {
-        // Reset Round
+        this.doubleTurn = false;
         this.count = 0;
         this.cardset = new CardSet();
         for (const player of this.players) {

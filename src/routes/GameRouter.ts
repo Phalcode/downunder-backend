@@ -206,7 +206,7 @@ router.post(
 // Reset a session
 router.delete(
   "/session/:sessionId/reset",
-  (request: Request, response: Response) => {
+  async (request: Request, response: Response) => {
     const session = sessions.find(
       (session) => session.id === request.params.sessionId
     );
@@ -214,7 +214,7 @@ router.delete(
       response.status(403).send(Errors.ERR_SESSION_STILL_ONGOING);
       return;
     }
-    session?.reset();
+    await session.reset();
     session.broadcastSession();
     response.status(200);
   }
