@@ -94,6 +94,9 @@ export class Session implements ISession {
       newPlayer.turn = true;
     }
     this.players.push(newPlayer);
+    console.log(
+      " HALLO1c: " + this.players + this.players.length + typeof this.players
+    );
     return newPlayer;
   }
 
@@ -245,14 +248,20 @@ export class Session implements ISession {
   }
 
   broadcastSession() {
-    for (const player of this.players) {
+    if (!this.players) {
+      return;
+    }
+    console.log(
+      " HALLO: " + this.players + this.players.length + typeof this.players
+    );
+    this.players.map((player: Player) => {
       this.stream.emit(
         `${this.id}-${player.id}`,
         "message",
         this.getStrippedSession(player.id)
       );
       console.log(`Broadcasted session to ${this.id}-${player.id}`);
-    }
+    });
   }
 
   pushSession(playerId: string) {

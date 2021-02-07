@@ -51,6 +51,7 @@ router.get(
     stream.on(`${session.id}-${player.id}`, (event: string, data: object) => {
       response.write(`event:${event}\ndata:${JSON.stringify(data)}\n\n`);
     });
+    session.pushSession(player.id);
   }
 );
 
