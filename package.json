@@ -1,6 +1,6 @@
 {
   "name": "downunder-server",
-  "version": "0.0.21",
+  "version": "0.0.22",
   "description": "Backend Server for Lowbob 77 Game",
   "private": true,
   "main": "index.js",
