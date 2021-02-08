@@ -28,7 +28,6 @@ router.post("/session", (request: Request, response: Response) => {
 router.get(
   "/session/:sessionId/player/:playerId",
   (request: Request, response: Response) => {
-    console.log(sessions);
     const session = sessions.find(
       (session) => session.id === request.params.sessionId
     );
