@@ -28,7 +28,7 @@ app.use(errorHandler);
 
 app.listen(port, () => {
   console.log(
-    `7️⃣ 7️⃣  Downunder 77 Server ${
+    `Downunder Server v${
       require("../../package.json").version
     } started on Port ${port}`
   );
