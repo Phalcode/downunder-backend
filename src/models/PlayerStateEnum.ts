@@ -1,6 +1,5 @@
 export enum PlayerStateEnum {
-    Ingame,
-    Winner,
-    Loser
-  }
-  
+  Ingame,
+  Winner,
+  Loser,
+}
