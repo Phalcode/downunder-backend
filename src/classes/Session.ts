@@ -92,7 +92,6 @@ export class Session implements ISession {
             newPlayer.turn = true;
         }
         this.players.push(newPlayer);
-        console.log(this.players, this.players.length, typeof this.players);
         return newPlayer;
     }
 
@@ -160,13 +159,13 @@ export class Session implements ISession {
     }
 
     getStrippedSession(playerId: string): ISession {
-        const session: ISession = JSON.parse(JSON.stringify(this));
+        const session: ISession = { ...this } as ISession;
         session.players?.map((player: IPlayer) => {
             delete session?.cardset?.cards;
-            delete player.socket;
+            delete player?.socket;
             if (player.id !== playerId) {
-                delete player.cards;
-                delete player.id;
+                delete player?.cards;
+                delete player?.id;
             }
         });
         return session;

@@ -31,4 +31,8 @@ export class Player implements IPlayer {
             .data;
         this.imageUrl = data.image_url;
     }
+
+    getStrippedPlayer(): IPlayer {
+        return { ...this, socket: undefined } as IPlayer;
+    }
 }

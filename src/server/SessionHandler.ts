@@ -5,10 +5,11 @@ import { ISession } from "../models/ISession";
 import { IPlayer } from "../models/IPlayer";
 import { Errors } from "../models/Errors";
 import { SocketReceivers } from "../models/SocketReceivers";
-import { SocketEmitters } from "../models/SocketEmitters";
+import { SocketEmitters, SocketEmitters } from "../models/SocketEmitters";
 import { Player } from "../classes/Player";
 import { Card } from "../classes/Card";
 import { PlayerStateEnum } from "../models/PlayerStateEnum";
+import { isReturnStatement } from "typescript";
 
 const log = new Logger();
 export default class SessionHandler {
@@ -18,22 +19,13 @@ export default class SessionHandler {
     constructor(io: Server) {
         this.io = io;
         this.sessions = [];
-        this.io.of("/").adapter.on("create-room", (room: string) => {
-            log.info(`Room ${room} was created`);
-        });
-        this.io.of("/").adapter.on("delete-room", (room: string) => {
-            log.info(`Room ${room} was deleted`);
-        });
-        this.io.of("/").adapter.on("join-room", (room: string, id: string) => {
-            log.info(`Client ${id} has joined room ${room}`);
-        });
-        this.io.of("/").adapter.on("leave-room", (room: string, id: string) => {
-            log.info(`Client ${id} has left room ${room}`);
-        });
         this.io.on("connection", (data: Socket) => this.websocketHandler(data));
     }
 
     websocketHandler(socket: Socket): void {
+        let socketPlayer: Player;
+        let socketSession: Session;
+
         log.info(
             `Client ${socket.id} connected from ${socket.handshake.address}`
         );
@@ -45,34 +37,72 @@ export default class SessionHandler {
                 session.SETTING_MAX_PLAYERS
             );
             this.sessions.push(newSession);
+            log.info(`Client ${socket.id} created session ${newSession.id}`);
             socket.emit(SocketEmitters.SESSION, newSession);
         });
 
         socket.on(
             SocketReceivers.JOIN_SESSION,
             async (sessionId: string, newPlayer: IPlayer) => {
+                // Check if requested session exists
                 const session = this.findSessionById(sessionId, socket);
                 if (!session) return;
+
+                // Check if requested session has already begun
                 if (session.checkIfSessionBegan()) {
+                    // Check if Join provides ID of an existing player -> Reconnect
                     if (newPlayer.id) {
+                        // Check if there is a player with his ID
                         const existingPlayer = this.findPlayerById(
                             session,
                             newPlayer.id,
                             socket
                         );
-                        socket.emit(SocketEmitters.PLAYER, existingPlayer);
+                        // Kick that MF out for trying to steal Identity
+                        if (!existingPlayer) return;
+                        // Rebuild new Player with old one
+                        socketPlayer = {
+                            ...existingPlayer,
+                            socket: socket,
+                        } as Player;
+                        socketSession = session;
+                        socket.emit(
+                            SocketEmitters.PLAYER,
+                            existingPlayer.getStrippedPlayer()
+                        );
+                        this.broadcastSession(session);
+                        log.info(
+                            `Client ${socket.id} rejoined session ${session.id}`
+                        );
+                        return;
                     }
-                    this.broadcastSession(session);
-                    return;
                 }
+
+                // Session is available and Player is not connected
                 try {
-                    const player = await session?.join(
+                    // Try to create Player with this Username
+                    socketPlayer = await session.join(
                         newPlayer.username,
                         socket
                     );
-                    socket.emit(SocketEmitters.PLAYER, player);
+                    socketSession = session;
+                    // Send new Player to Client
+                    log.info(
+                        "Sending new Player to Client",
+                        socketPlayer.getStrippedPlayer()
+                    );
+                    socket.emit(
+                        SocketEmitters.PLAYER,
+                        socketPlayer.getStrippedPlayer()
+                    );
+                    // Broadcast Clients that he has connected
+                    log.info("Broadcasting Session");
                     this.broadcastSession(session);
+                    log.info(
+                        `Client ${socket.id} joined session ${session.id}`
+                    );
                 } catch (error) {
+                    log.error(error);
                     switch (error.message as Errors) {
                         case Errors.ERR_MAX_PLAYERS:
                             socket.emit(
@@ -137,7 +167,24 @@ export default class SessionHandler {
                 session.playCard(player, card);
                 session.refillPlayerCards(player);
                 session.nextTurn();
+                log.info(
+                    `Client ${socket.id} played card ${card.id} in session ${session.id}`
+                );
                 this.broadcastSession(session);
+            }
+        );
+
+        socket.on(
+            SocketReceivers.GET_SESSION,
+            async (sessionId: string, playerId: string) => {
+                const session = this.findSessionById(sessionId, socket);
+                if (!session) return;
+                const player = this.findPlayerById(session, playerId, socket);
+                if (!player) return;
+                socket.emit(
+                    SocketEmitters.SESSION,
+                    session.getStrippedSession(playerId)
+                );
             }
         );
 
@@ -156,12 +203,12 @@ export default class SessionHandler {
         });
 
         socket.on("disconnect", () => {
-            //TODO: socket.broadcast.emit("leave", "");
+            this.cleanPlayerAndSession(socketPlayer, socketSession);
             log.info(`Client ${socket.id} closed connection`);
         });
 
         socket.on("error", (error: Error) => {
-            //TODO: socket.broadcast.emit("leave", "");
+            this.cleanPlayerAndSession(socketPlayer, socketSession);
             log.error(
                 `Client Socket Error: ${socket.id}, ${socket.handshake.address}`,
                 error.message
@@ -169,8 +216,22 @@ export default class SessionHandler {
         });
     }
 
+    cleanPlayerAndSession(socketPlayer: Player, socketSession: Session): void {
+        if (!socketSession || !socketPlayer) return;
+        socketSession.leave(socketPlayer.id);
+        if (socketSession.players.length === 0) {
+            log.info(`Garbage collected Session ${socketSession.id}`);
+            this.sessions = this.sessions.filter(
+                (existingSession) => existingSession.id !== socketSession.id
+            );
+        } else {
+            this.broadcastSession(socketSession);
+        }
+    }
+
     broadcastSession(session: Session) {
         session.players.map((player: Player) => {
+            log.info("broadcasting session to player ", player.id);
             player.socket.emit(
                 SocketEmitters.SESSION,
                 session.getStrippedSession(player.id)
