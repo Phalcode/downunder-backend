@@ -10,7 +10,7 @@ const log = new Logger();
 const port = process.env.PORT || 80;
 const app: express.Application = express();
 const corsOptions: CorsOptions = {
-    origin: /(https:\/\/downunder.platform.alfagun74.de|https:\/\/downunder-test.platform.alfagun74.de|http:\/\/localhost)/,
+    origin: /(https:\/\/downunder.platform.alfagun74.de|https:\/\/downunder-test.platform.alfagun74.de|http:\/\/localhost:4200)/,
     optionsSuccessStatus: 200,
 };
 
@@ -24,7 +24,11 @@ app.use(express.urlencoded({ extended: true }));
 
 const server = app.listen({ port: +port, host: "0.0.0.0" }, () => {
     sessionHandler = new SessionHandler(
-        new Server(server)
+        new Server(server, {
+            cors: {
+                origin: corsOptions.origin,
+            },
+        })
     );
     log.info(
         `DownUnder Server v${
