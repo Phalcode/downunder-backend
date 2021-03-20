@@ -8,7 +8,6 @@ import { Errors } from "../models/Errors";
 import { IPlayer } from "../models/IPlayer";
 import { PlayerStateEnum } from "../models/PlayerStateEnum";
 import { SessionStateEnum } from "../models/SessionStateEnum";
-import events from "events";
 import { Socket } from "socket.io";
 
 export class Session implements ISession {
@@ -164,6 +163,7 @@ export class Session implements ISession {
         const session: ISession = JSON.parse(JSON.stringify(this));
         session.players?.map((player: IPlayer) => {
             delete session?.cardset?.cards;
+            delete player.socket;
             if (player.id !== playerId) {
                 delete player.cards;
                 delete player.id;
