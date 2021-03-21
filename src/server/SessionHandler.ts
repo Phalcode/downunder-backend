@@ -5,11 +5,10 @@ import { ISession } from "../models/ISession";
 import { IPlayer } from "../models/IPlayer";
 import { Errors } from "../models/Errors";
 import { SocketReceivers } from "../models/SocketReceivers";
-import { SocketEmitters, SocketEmitters } from "../models/SocketEmitters";
+import { SocketEmitters } from "../models/SocketEmitters";
 import { Player } from "../classes/Player";
 import { Card } from "../classes/Card";
 import { PlayerStateEnum } from "../models/PlayerStateEnum";
-import { isReturnStatement } from "typescript";
 
 const log = new Logger();
 export default class SessionHandler {
@@ -87,20 +86,15 @@ export default class SessionHandler {
                     );
                     socketSession = session;
                     // Send new Player to Client
-                    log.info(
-                        "Sending new Player to Client",
-                        socketPlayer.getStrippedPlayer()
-                    );
                     socket.emit(
                         SocketEmitters.PLAYER,
                         socketPlayer.getStrippedPlayer()
                     );
                     // Broadcast Clients that he has connected
-                    log.info("Broadcasting Session");
-                    this.broadcastSession(session);
                     log.info(
                         `Client ${socket.id} joined session ${session.id}`
                     );
+                    this.broadcastSession(session);
                 } catch (error) {
                     log.error(error);
                     switch (error.message as Errors) {
@@ -136,21 +130,18 @@ export default class SessionHandler {
         socket.on(
             SocketReceivers.PLAY,
             (sessionId: string, playerId: string, cardId: string) => {
+                // Find Session the Player wants to play a card in
                 const session = this.findSessionById(sessionId, socket);
                 if (!session) return;
-                if (!session.checkIfSessionBegan()) {
-                    socket.emit(
-                        SocketEmitters.THROW_ERROR,
-                        Errors.ERR_SESSION_ALREADY_STARTED
-                    );
-                    return;
-                }
+                // Check if Player is alone
                 if (session.players.length < 2) {
                     socket.emit(SocketEmitters.THROW_ERROR, Errors.ERR_ALONE);
                     return;
                 }
+                // Find Player that wants to play the card
                 const player = this.findPlayerById(session, playerId, socket);
                 if (!player) return;
+                // Check if it is the Players turn
                 if (!player.turn) {
                     socket.emit(
                         SocketEmitters.THROW_ERROR,
@@ -158,12 +149,15 @@ export default class SessionHandler {
                     );
                     return;
                 }
+                // Check if the Player has already lost
                 if (player.state === PlayerStateEnum.Loser) {
                     socket.emit(SocketEmitters.THROW_ERROR, Errors.ERR_LOST);
                     return;
                 }
+                // Find the card the player wants to play
                 const card = this.findCardById(player, cardId, socket);
                 if (!card) return;
+                // Play the card, draw a new one and pass the turn
                 session.playCard(player, card);
                 session.refillPlayerCards(player);
                 session.nextTurn();
@@ -230,8 +224,8 @@ export default class SessionHandler {
     }
 
     broadcastSession(session: Session) {
+        log.info("Broadcast session ", session.id);
         session.players.map((player: Player) => {
-            log.info("broadcasting session to player ", player.id);
             player.socket.emit(
                 SocketEmitters.SESSION,
                 session.getStrippedSession(player.id)
