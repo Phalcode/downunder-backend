@@ -4,6 +4,7 @@ import { Card } from "./Card";
 import axios from "axios";
 import { PlayerStateEnum } from "../models/PlayerStateEnum";
 import { Socket } from "socket.io";
+import rfdc from "rfdc";
 export class Player implements IPlayer {
     id = nanoid(5);
     username: string;
@@ -11,17 +12,17 @@ export class Player implements IPlayer {
     chips: number;
     turn: boolean = false;
     imageUrl: string = "";
-    socket: Socket;
+    socketId: string;
     state: PlayerStateEnum = PlayerStateEnum.Ingame;
 
     constructor(
         username: string,
-        socket: Socket,
+        socketId: string,
         cards: Card[],
         chips: number = 3
     ) {
         this.username = username;
-        this.socket = socket;
+        this.socketId = socketId;
         this.cards = cards;
         this.chips = chips;
     }
@@ -33,6 +34,6 @@ export class Player implements IPlayer {
     }
 
     getStrippedPlayer(): IPlayer {
-        return { ...this, socket: undefined } as IPlayer;
+        return rfdc()<IPlayer>(this);
     }
 }

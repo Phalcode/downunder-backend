@@ -14,6 +14,7 @@ const log = new Logger();
 export default class SessionHandler {
     io: Server;
     sessions: Session[];
+    clients: Map<string, Socket> = new Map<string, Socket>();
 
     constructor(io: Server) {
         this.io = io;
@@ -24,7 +25,7 @@ export default class SessionHandler {
     websocketHandler(socket: Socket): void {
         let socketPlayer: Player;
         let socketSession: Session;
-
+        this.clients.set(socket.id, socket);
         log.info(
             `Client ${socket.id} connected from ${socket.handshake.address}`
         );
@@ -45,6 +46,7 @@ export default class SessionHandler {
             async (sessionId: string, newPlayer: IPlayer) => {
                 // Check if requested session exists
                 const session = this.findSessionById(sessionId, socket);
+                console.log("SessionKopie", session);
                 if (!session) return;
 
                 // Check if requested session has already begun
@@ -62,7 +64,6 @@ export default class SessionHandler {
                         // Rebuild new Player with old one
                         socketPlayer = {
                             ...existingPlayer,
-                            socket: socket,
                         } as Player;
                         socketSession = session;
                         socket.emit(
@@ -79,10 +80,11 @@ export default class SessionHandler {
 
                 // Session is available and Player is not connected
                 try {
+                    console.log(this.sessions);
                     // Try to create Player with this Username
                     socketPlayer = await session.join(
                         newPlayer.username,
-                        socket
+                        socket.id
                     );
                     socketSession = session;
                     // Send new Player to Client
@@ -224,13 +226,21 @@ export default class SessionHandler {
     }
 
     broadcastSession(session: Session) {
-        log.info("Broadcast session ", session.id);
         session.players.map((player: Player) => {
-            player.socket.emit(
+            const socket = this.findSocketById(player.socketId);
+            if (!socket) {
+                session.players.splice(session.players.indexOf(player), 1);
+                return;
+            }
+            socket.emit(
                 SocketEmitters.SESSION,
                 session.getStrippedSession(player.id)
             );
         });
+    }
+
+    findSocketById(socketId: string): Socket | undefined {
+        return this.clients.get(socketId);
     }
 
     findSessionById(sessionId: string, socket: Socket): Session | undefined {

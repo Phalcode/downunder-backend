@@ -9,6 +9,7 @@ import { IPlayer } from "../models/IPlayer";
 import { PlayerStateEnum } from "../models/PlayerStateEnum";
 import { SessionStateEnum } from "../models/SessionStateEnum";
 import { Socket } from "socket.io";
+import rfdc from "rfdc";
 
 export class Session implements ISession {
     readonly id = nanoid(5);
@@ -63,7 +64,7 @@ export class Session implements ISession {
         this.players[0].turn = true;
     }
 
-    async join(username: string, socket: Socket) {
+    async join(username: string, socketId: string) {
         if (username.length < 3) {
             throw new Error(Errors.ERR_USERNAME_TOO_SHORT);
         }
@@ -83,7 +84,7 @@ export class Session implements ISession {
 
         const newPlayer = new Player(
             username,
-            socket,
+            socketId,
             this.cardset.drawMultiple(5),
             this.SETTING_CHIPS
         );
@@ -159,7 +160,7 @@ export class Session implements ISession {
     }
 
     getStrippedSession(playerId: string): ISession {
-        const session: ISession = { ...this } as ISession;
+        const session: ISession = rfdc()<ISession>(this);
         session.players?.map((player: IPlayer) => {
             delete session?.cardset?.cards;
             delete player?.socket;
