@@ -1,13 +1,14 @@
 {
   "name": "downunder-server",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Backend Server for DownUnder Game",
   "private": true,
   "scripts": {
     "start": "npm run build && npm run serve",
     "deploy": "npm --no-git-tag-version version patch",
     "build": "tsc",
-    "serve": "node ./bin/server/Server.js"
+    "serve": "node ./bin/server/Server.js",
+    "prepare": "husky install"
   },
   "authors": [
     "Alfagun74"
