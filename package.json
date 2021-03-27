@@ -1,6 +1,6 @@
 {
   "name": "downunder-server",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Backend Server for DownUnder Game",
   "private": true,
   "scripts": {
