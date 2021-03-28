@@ -1,6 +1,6 @@
 {
   "name": "downunder-server",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Backend Server for DownUnder Game",
   "private": true,
   "scripts": {
@@ -13,7 +13,7 @@
   "authors": [
     "Alfagun74"
   ],
-  "license": "ISC",
+  "license": "UNLICENSED",
   "dependencies": {
     "@types/cookie-parser": "^1.4.2",
     "@types/cors": "^2.8.9",

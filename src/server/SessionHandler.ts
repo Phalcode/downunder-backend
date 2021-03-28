@@ -34,7 +34,9 @@ export default class SessionHandler {
             const newSession = new Session(
                 session.SETTING_NAME,
                 session.SETTING_CHIPS,
-                session.SETTING_MAX_PLAYERS
+                session.SETTING_MAX_PLAYERS,
+                session.SETTING_MAX_COUNT,
+                (sessionToBroadcast: Session) => this.broadcastSession(sessionToBroadcast)
             );
             this.sessions.push(newSession);
             log.info(`Client ${socket.id} created session ${newSession.id}`);
@@ -46,7 +48,6 @@ export default class SessionHandler {
             async (sessionId: string, newPlayer: IPlayer) => {
                 // Check if requested session exists
                 const session = this.findSessionById(sessionId, socket);
-                console.log("SessionKopie", session);
                 if (!session) return;
 
                 // Check if requested session has already begun

@@ -8,15 +8,12 @@ import { Errors } from "../models/Errors";
 import { IPlayer } from "../models/IPlayer";
 import { PlayerStateEnum } from "../models/PlayerStateEnum";
 import { SessionStateEnum } from "../models/SessionStateEnum";
-import { Socket } from "socket.io";
+import { Logger } from "tslog";
 import rfdc from "rfdc";
 
+const log = new Logger();
 export class Session implements ISession {
     readonly id = nanoid(5);
-    readonly SETTING_NAME: string;
-    readonly SETTING_CHIPS: number;
-    readonly SETTING_MAX_PLAYERS: number;
-    readonly SETTING_MAX_COUNT: number;
     state: SessionStateEnum = SessionStateEnum.Running;
     cardset: CardSet = new CardSet();
     players: Player[] = [];
@@ -28,16 +25,12 @@ export class Session implements ISession {
     private doubleTurnActivator: number = -1;
 
     constructor(
-        SETTING_NAME: string,
-        SETTING_CHIPS = 3,
-        SETTING_MAX_PLAYERS = 8,
-        SETTING_MAX_COUNT = 77
-    ) {
-        this.SETTING_NAME = SETTING_NAME;
-        this.SETTING_CHIPS = SETTING_CHIPS;
-        this.SETTING_MAX_PLAYERS = SETTING_MAX_PLAYERS;
-        this.SETTING_MAX_COUNT = SETTING_MAX_COUNT;
-    }
+        readonly SETTING_NAME: string,
+        readonly SETTING_CHIPS = 3,
+        readonly SETTING_MAX_PLAYERS = 8,
+        readonly SETTING_MAX_COUNT = 77,
+        private broadcastSession: (sessionToBroadcast: Session) => void
+    ) {}
 
     async reset() {
         this.cardset = new CardSet();
@@ -62,6 +55,8 @@ export class Session implements ISession {
             ];
         }
         this.players[0].turn = true;
+        log.info("Resetted Session: " + this.id);
+        this.broadcastSession(this);
     }
 
     async join(username: string, socketId: string) {
@@ -245,6 +240,8 @@ export class Session implements ISession {
                 for (let player of this.players) {
                     player.cards = [];
                 }
+                //RESTART SESSION IN 15 SEC
+                setTimeout(() => this.reset(), 15000);
             }
         }
     }
