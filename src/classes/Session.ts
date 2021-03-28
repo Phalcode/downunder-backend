@@ -190,6 +190,10 @@ export class Session implements ISession {
     private playNormalCard(card: Card) {
         this.count += card?.value || 0;
 
+        if (this.count === this.SETTING_MAX_COUNT) {
+            return;
+        }
+
         if (this.count % 11 === 0 && card?.value != 0) {
             this.pasch = true;
         }
